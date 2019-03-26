@@ -1,7 +1,8 @@
-package application;
+package course.oop.application;
 	
 import javafx.application.Application;
 import javafx.stage.Stage;
+import course.oop.view.MainView;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 
@@ -10,11 +11,18 @@ public class Main extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		try {
-			BorderPane root = new BorderPane();
+			/*BorderPane root = new BorderPane();
 			Scene scene = new Scene(root,400,400);
-			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			//scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
-			primaryStage.show(); //commit
+			primaryStage.show(); //commit*/
+			
+			
+			MainView mView = new MainView();
+			Scene scene = mView.getMainScene();
+			primaryStage.setTitle("TicTacToe - Hubert Zhao");
+			primaryStage.setScene(scene);
+			primaryStage.show();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

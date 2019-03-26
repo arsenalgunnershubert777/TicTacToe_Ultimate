@@ -1,0 +1,13 @@
+.root{
+	-fx-background-color: blue;
+	-fx-font-size: 16pt;
+	-fx-font-family: "Verdana";
+	-fx-background: rgb(225, 228, 203);
+}
+.tileButton{
+	-fx-pref-height: 75px;
+    -fx-pref-width: 75px;
+}
+.orangeButton:hover{
+	-fx-color: rgb(255, 0,0);
+}

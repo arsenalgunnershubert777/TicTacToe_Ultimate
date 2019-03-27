@@ -1,9 +1,9 @@
 package course.oop.view;
+
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
-
 
 import course.oop.computer.Computer;
 import course.oop.controller.TTTControllerImpl;
@@ -28,143 +28,90 @@ import javafx.scene.text.Text;
 import javafx.scene.transform.Rotate;
 import javafx.util.Duration;
 
-
-
-
-public class MainView {
-	private BorderPane root;
-	private Scene scene; 
-    private TTTControllerImpl TTTController;
-	private Text statusNode;
-    private final int windowWidth = 1000;
+public class GameView extends ViewState {
+	private final int windowWidth = 1000;
     private final int windowHeight = 900;
+    private TTTControllerImpl TTTController;
+    private boolean computerPlaying = false;
+    private int computerNumber = 0;
+    private Text statusLabel = new Text(10, 50,"");
+    private Computer computer = new Computer();
     private int gameState = 0;
     private int gamePlayerTurn = 1;
     private Button[] buttons =  new Button[9];
-    private boolean computerPlaying = false;
-    private int computerNumber = 0;
-    private Computer computer = new Computer();
     private int time = 0;
     private Timer turnTimer;
     private TimerTask task;
-    //private GridPane ticTacToePane;
-    private Text statusLabel = new Text(10, 50,"");
-   
-    private RecordManager records = new RecordManager();
     
-    private StateMachine machine;
-    
-	public MainView() {
-		this.root = new BorderPane();
-		this.scene = new Scene(root, windowWidth, windowHeight);
-		this.scene.getStylesheets().add(getClass().getResource("main.css").toExternalForm());
-		//this.statusNode = new Text("no status");
-		
-		this.machine = new StateMachine(root);
-		machine.addState(new MenuView(machine, records));
-		
-		//this.root.setTop(this.buildSetupPane());
-		
+	public GameView(StateMachine machine, RecordManager records, TTTControllerImpl TTTController, boolean ComputerPlaying, int ComputerNumber) {
+		super(machine, records);
+		this.TTTController = TTTController;
+		this.computerPlaying = ComputerPlaying;
+		this.computerNumber = ComputerNumber;
+		this.time = TTTController.getTimeOut();
 		
 	}
-	
-	public Scene getMainScene() {
-		return this.scene;
-	}
-
-	/*public void start(Stage primaryStage){
-        BorderPane root = new BorderPane();
-        Menu file = new Menu("File");
-        MenuBar tb = new MenuBar(file);
-        Group g1 = new Group();
-        Group g2 = new Group();
-        Scene sc1 = new Scene(root, 150, 100);
-        root.setCenter(g1);
-        root.setTop(tb);
-
-        Label t1 = new Label("This is panel 1");
-        Button b1 = new Button("Go to panel 2");
-        Label t2 = new Label("This is panel 2");
-        Button b2 = new Button("Go to panel 1");
-        t1.setTranslateY(15);
-        t2.setTranslateY(15);
-        b1.setTranslateY(50);
-        b2.setTranslateY(50);
-        g1.getChildren().addAll(t1, b1);
-        g2.getChildren().addAll(t2, b2);
-
-        b1.setOnMouseClicked(e -> { root.setCenter(g2); });
-        b2.setOnMouseClicked(e -> { root.setCenter(g1); });
-
-        primaryStage.setScene(sc1);
-        primaryStage.show();
-    }*/
-	/*public GridPane buildSetupPane() {
-		buildUserDataPane();
-		Text numberPlayersLabel = new Text("Number of Players:");
-		TextField numberPlayersTextField = new TextField();
+	public GridPane constructPane() {
 		
-		Text playerOneNameLabel = new Text("Player One Name:");
-		TextField playerOneNameTextField = new TextField();
-		
-		Text playerOneMarkerLabel = new Text("Player One Marker:");
-		TextField playerOneMarkerTextField = new TextField();
-		
-		
-		Text playerTwoNameLabel = new Text("Player Two Name:");
-		TextField playerTwoNameTextField = new TextField();
-		
-		Text playerTwoMarkerLabel = new Text("Player Two Marker:");
-		TextField playerTwoMarkerTextField = new TextField();
-		
-		Text playerOrderLabel = new Text("Order vs Computer (1: player first, 2: computer first): ");
-		TextField playerOrderTextField = new TextField();
-		
-		Text timerLabel = new Text("Timer in seconds (0 for no timer): ");
-		TextField timerTextField = new TextField();
-		
-        Button button1 = new Button("Start Game"); 
-        Button button2 = new Button("Quit Game"); 
-        Line line = new Line();
-        
-        
-        line.setStartX(0.0f); 
-        line.setStartY(0.0f);         
-        line.setEndX((float) windowWidth); 
-        line.setEndY(0.0f);
-        
+		GridPane gridPane = new GridPane(); 
+       
+        Button button1 = new Button("Return to Menu"); 
+        Button button2 = new Button("Play again with different Settings");
+        Button button3 = new Button("Play again with same settings");
         //Creating the mouse event handler 
-        EventHandler<MouseEvent> eventHandler = new EventHandler<MouseEvent>() { 
-           @Override 
-           public void handle(MouseEvent e) { 
-
-        	   String numPlayers = numberPlayersTextField.getText();
-        	   String playerOneName = playerOneNameTextField.getText();
-        	   String playerOneMarker = playerOneMarkerTextField.getText();
-        	   String playerTwoName = playerTwoNameTextField.getText();
-        	   String playerTwoMarker = playerTwoMarkerTextField.getText();
-        	   String playerOrder = playerOrderTextField.getText();
-        	   String time_ = timerTextField.getText();
-        	   buildTicTacToePane(numPlayers, playerOneName, playerOneMarker, playerTwoName, playerTwoMarker, playerOrder, time_);
-        	   
-           } 
-        };  
+        gridPane.getStyleClass().add("gamePane");
         
         
-        EventHandler<MouseEvent> eventHandler2 = new EventHandler<MouseEvent>() { 
+        EventHandler<MouseEvent> eventHandlerb1 = new EventHandler<MouseEvent>() { 
             @Override 
             public void handle(MouseEvent e) { 
 
-         	   Platform.exit();
+         	   StateMachine machine = getMachine();
+         	   RecordManager records = getRecordManager();
+         	   machine.removeState();
+        	   //machine.removeStateWithReplace(new MenuView(machine, records));
          	   
             } 
          };
         //Registering the event filter 
-        button1.addEventFilter(MouseEvent.MOUSE_CLICKED, eventHandler);
-        button2.addEventFilter(MouseEvent.MOUSE_CLICKED, eventHandler2);   
+         
+         EventHandler<MouseEvent> eventHandlerb2 = new EventHandler<MouseEvent>() { 
+             @Override 
+             public void handle(MouseEvent e) { 
 
+          	   StateMachine machine = getMachine();
+          	   RecordManager records = getRecordManager();
+         	   machine.removeStateWithReplace(new SettingsView(machine, records));
+          	   
+             } 
+          };
+         
+          EventHandler<MouseEvent> eventHandlerb3 = new EventHandler<MouseEvent>() { 
+              @Override 
+              public void handle(MouseEvent e) { 
+
+           	   StateMachine machine = getMachine();
+           	   RecordManager records = getRecordManager();
+           	   int numPlayers = 2;
+           	   if (computerPlaying) {
+           		   numPlayers = 1;
+           	   }
+           	   TTTController.startNewGame(numPlayers, time);
+          	   machine.removeStateWithReplace(new GameView(machine, records, TTTController, computerPlaying, computerNumber));
+           	   
+              } 
+           };
+         
+        button1.addEventFilter(MouseEvent.MOUSE_CLICKED, eventHandlerb1);   
+        button2.addEventFilter(MouseEvent.MOUSE_CLICKED, eventHandlerb2);   
+        button3.addEventFilter(MouseEvent.MOUSE_CLICKED, eventHandlerb3);  
+        
+        
+        gridPane.add(button1, 4, 2);
+        gridPane.add(button2, 4, 1);
+        gridPane.add(button3, 4, 0);
         //Creating a Grid Pane 
-        GridPane gridPane = new GridPane();    
+          
         
         //Setting size for the pane 
         gridPane.setMinSize(windowWidth, (int) windowHeight/4); 
@@ -179,141 +126,7 @@ public class MainView {
         //Setting the Grid alignment 
         gridPane.setAlignment(Pos.CENTER); 
         
-        gridPane.add(numberPlayersLabel, 0, 1); 
-        gridPane.add(numberPlayersTextField, 1, 1);
-        
-        gridPane.add(playerOneNameLabel, 0, 2);
-        gridPane.add(playerOneNameTextField, 1, 2);
-        
-        
-        gridPane.add(playerOneMarkerLabel, 0, 3);
-        gridPane.add(playerOneMarkerTextField, 1, 3);
-        
-        
-        gridPane.add(playerTwoNameLabel, 0, 4);
-        gridPane.add(playerTwoNameTextField, 1, 4);
-        
-        
-        gridPane.add(playerTwoMarkerLabel, 0, 5);
-        gridPane.add(playerTwoMarkerTextField, 1, 5);
-        
-        gridPane.add(playerOrderLabel, 0, 6);
-        gridPane.add(playerOrderTextField, 1, 6);
-        
-        
-        gridPane.add(timerLabel, 0, 7);
-        gridPane.add(timerTextField, 1, 7);
-      
-        gridPane.add(button1, 0, 0); 
-        gridPane.add(button2, 1, 0);
-      
-              
-        return gridPane;
-	}
-	
-	public void buildUserDataPane() {
-		root.setCenter(new Text());
-		GridPane userDataPane = new GridPane();
-		Text[] dataLabels = new Text[5];
-		int i = 0;
-		for (String s : records.getRecords().keySet()) {
-			Records r = records.getRecords().get(s);
-			dataLabels[i] = new Text("Name: " + r.getName() + " Marker: " + r.getMarker() + " Wins: " + r.getWins() + " Losses: " + r.getLosses() + " Ties: " + r.getTies());
-			userDataPane.add(dataLabels[i], 0, i);
-			i++;
-			if (i == 5) {
-				break;
-			}
-		}
-		root.setCenter(userDataPane);
-	}
-	
-	
-	public void buildTicTacToePane(String numPlayers, String playerOneName, String playerOneMarker, String playerTwoName, String playerTwoMarker, String playerOrder,String time_) {
-		
-		GridPane ticTacToePane = new GridPane();
-		 
-        
-		gameState = 1;
-		gamePlayerTurn = 1;
-		String text = "";
-		//Clear other panes
-		root.setLeft(new Text());
-		root.setRight(new Text());
-		root.setBottom(new Text());
-		root.setBottom(ticTacToePane);
-		ticTacToePane.setAlignment(Pos.CENTER);
-		ticTacToePane.setHgap(10);
-		ticTacToePane.setVgap(12);
-		try {
-
-	        TTTController = new TTTControllerImpl();
-	        time = Integer.parseInt(time_);
-	        if (Integer.parseInt(numPlayers) == 1) {
-				computerPlaying = true;
-				computerNumber = 3 - Integer.parseInt(playerOrder);
-				
-			}
-			else {
-				computerPlaying = false;
-				computerNumber = 0;
-			}
-	        
-	        if (computerPlaying) {
-	        	TTTController.createPlayer(playerOneName, playerOneMarker, Integer.parseInt(playerOrder));
-	        }
-	        else {
-	        	TTTController.createPlayer(playerOneName, playerOneMarker, 1);
-	        }
-	        if (Integer.parseInt(numPlayers) == 2) {
-	        	TTTController.createPlayer(playerTwoName, playerTwoMarker, 2);
-	        }
-	        
-	        
-	        TTTController.startNewGame(Integer.parseInt(numPlayers), time);
-
-		}catch(NumberFormatException nfe) {
-			text = "Please enter integer values!";
-			
-		}
-		
-		
-		//Text TTTDisplay= new Text(text);
-		//TTTDisplay.setId("TTTDisplay");
-		//MotionBlur mb= new MotionBlur();
-		//mb.setRadius(5.0f);
-		//mb.setAngle(15.0f);
-		//arrDisplay.setEffect(mb);
-		//creating the rotation transformation 
-		//Rotate rotate= new Rotate(); 
-		//Setting the angle for the rotation 
-		//rotate.setAngle(20); 
-		//arrDisplay.getTransforms().addAll(rotate);
-		//root.setCenter(TTTDisplay);
-		
-		 
-		
-		
-		
-		for (int i = 0; i < 9; i++) {
-			buttons[i] = new Button(" ");
-			buttons[i].getStyleClass().add("tileButton");
-			
-			//buttons[i].setText(" ");
-			ticTacToePane.add(buttons[i], i%3, i/3);
-		}
-		
-		
-		ticTacToePane.add(statusLabel, 4, 0);
-		
-		AnimationTimer timer = new AnimationTimer() {
-            @Override
-            public void handle(long now) {
-               update();
-                
-            }
-        };
-        timer.start();
+       
         
         EventHandler<MouseEvent> eventHandler0 = new EventHandler<MouseEvent>() { 
             @Override 
@@ -444,6 +257,22 @@ public class MainView {
             	}
             } 
         };
+        
+      
+        
+      
+        
+        
+        
+        for (int i = 0; i < 9; i++) {
+			buttons[i] = new Button(" ");
+			buttons[i].getStyleClass().add("tileButton");
+			
+			//buttons[i].setText(" ");
+			gridPane.add(buttons[i], i%3, i/3);
+		}
+        gridPane.add(statusLabel, 3, 0);
+        
         buttons[0].addEventFilter(MouseEvent.MOUSE_CLICKED, eventHandler0);
         buttons[1].addEventFilter(MouseEvent.MOUSE_CLICKED, eventHandler1);
         buttons[2].addEventFilter(MouseEvent.MOUSE_CLICKED, eventHandler2);
@@ -454,15 +283,22 @@ public class MainView {
         buttons[7].addEventFilter(MouseEvent.MOUSE_CLICKED, eventHandler7);
         buttons[8].addEventFilter(MouseEvent.MOUSE_CLICKED, eventHandler8);
         
-       
-        
+        AnimationTimer timer = new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+               update();
+                
+            }
+        };
+        timer.start();
+        gameState = 1;
         if (time > 0) {
 			
 			timerSet();
 			
 		}
-        
-
+              
+        return gridPane;
 	}
 	
 	private void timerSet( ) {
@@ -490,6 +326,7 @@ public class MainView {
 		
 	}
 	
+	
 	private void update() {
 		if (time > 0 && gameState == 3) {
 			
@@ -514,12 +351,13 @@ public class MainView {
 			plonkSound.play();
 			
 			addRecords(3- gamePlayerTurn);
-			buildUserDataPane();
+			
 			
 		}
 		
 		int[][] board = TTTController.getBoard();
 		if (gameState == 1) {
+			
 			for (int i = 0; i < 9; i++) {
 				
 				int state = (board[i/3][i%3]);
@@ -584,7 +422,7 @@ public class MainView {
 			
 			//ticTacToePane.add(statusLabel, 4, 0);
 			addRecords(winner);
-			buildUserDataPane();
+			
 		}
 		
 		
@@ -615,7 +453,8 @@ public class MainView {
     }
 	
 	private void addRecords(int winnerNum) {
-		HashMap<String, Records> hmap = records.getRecords();
+		//HashMap<String, Records> hmap = records.getRecords();
+		HashMap<String, Records> hmap = getRecordManager().getRecords();
 		String playerOne = TTTController.getPlayers()[0].getName();
 		String playerOneMarker = TTTController.getPlayers()[0].getMarker();
 		
@@ -713,18 +552,18 @@ public class MainView {
 			}
 			r.setMarker(playerTwoMarker);
 		}
-		for (String s : hmap.keySet()) {
+		/*for (String s : hmap.keySet()) {
 			System.out.println(s);
 			System.out.println(hmap.get(s).getWins());
 			System.out.println(hmap.get(s).getLosses());
 			System.out.println(hmap.get(s).getTies());
-		}
+		}*/
 		
 		
 		
 		
-		records.writeBack();
+		getRecordManager().writeBack();
 		
-	}*/
-	
+	}
+
 }

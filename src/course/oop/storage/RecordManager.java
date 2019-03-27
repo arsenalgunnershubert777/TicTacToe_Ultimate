@@ -42,7 +42,7 @@ public class RecordManager {
                oos.writeObject(records);
                oos.close();
                fos.close();
-               System.out.printf("Serialized HashMap data is saved in records.ser");
+               //System.out.printf("Serialized HashMap data is saved in records.ser");
         }catch(IOException ioe)
          {
                ioe.printStackTrace();

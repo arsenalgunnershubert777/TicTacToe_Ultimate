@@ -13,6 +13,7 @@ This is a tic tac toe GUI program that allows the user to play against another u
   - To check for that, go to 'Project', then click 'Properties', go to 'Java Compiler', click 'Enable project specific settings', and set the 'compiler compliance level' to 1.8
   - Make sure Java 8 and the JavaFX plugin are installed beforehand
 - To run the GUI program, go to the course.oop.application package and run the Main.java program 
+- Please ignore the git version control files in the zip, they should not interfere with running the program, but if they do, please contact me (see bottom)
 
 
 ### How to play the TicTacToe game

@@ -71,10 +71,25 @@ public class SettingsView extends ViewState {
         	   if (!numberPlayersTextField.getText().trim().isEmpty()) {
         		   numPlayers = numberPlayersTextField.getText();
         	   }
-        	   String playerOneName = playerOneNameTextField.getText();
-        	   String playerOneMarker = playerOneMarkerTextField.getText();
-        	   String playerTwoName = playerTwoNameTextField.getText();
-        	   String playerTwoMarker = playerTwoMarkerTextField.getText();
+        	   String playerOneName = "Player One";
+        	   if (!playerOneNameTextField.getText().trim().isEmpty()) {
+        		   playerOneName = playerOneNameTextField.getText();
+        	   }
+        	   
+        	   String playerOneMarker = "X"; 
+        	   if (!playerOneMarkerTextField.getText().trim().isEmpty()) {
+        		   playerOneMarker = playerOneMarkerTextField.getText();
+        	   }
+        	   String playerTwoName = "Player Two";
+        	   if (!playerTwoNameTextField.getText().trim().isEmpty()) {
+        		   playerTwoName = playerTwoNameTextField.getText();
+        	   }
+        	   
+        	   
+        	   String playerTwoMarker = "O";
+        	   if (!playerTwoMarkerTextField.getText().trim().isEmpty()) {
+        		   playerTwoMarker = playerTwoMarkerTextField.getText();
+        	   }
         	   
         	   String playerOrder = "1"; //default
         	   if (!playerOrderTextField.getText().trim().isEmpty()) {

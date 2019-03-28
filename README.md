@@ -26,10 +26,11 @@ This is a tic tac toe GUI program that allows the user to play against another u
   - The return menu button will take you back the menu, while the start game button will start a game with the provided input
   - Currently the text boxes do not handle bad input so please only input numbers into the number of players, order, and timer text boxes
   - Please also do not use the same marker for both players
-- If the start game button is clicked, the screen moves to teh game screen, where the tic tac toe board is displayed
+- If the start game button is clicked, the screen moves to the game screen, where the tic tac toe board is displayed
   - To play, whoever is going first will click on the tile they want to place, and the tile will change to indicate the marker
   - There is a status text that will display Game on! until one player or the computer wins, and then there will be a sound and animation
   - If the timer is on, and time runs out for a player, the other player wins automatically
+  - You can return to the menu, play again with the same settings, or play with different settings from the game screen
 
 #### Creator Contact
 - If there are any issues, or clarifications needed, for the compile, run, or play of this game, please contact me at hubert777@ufl.edu, or 407-765-8806

@@ -1,6 +1,6 @@
 # TicTacToe
 ### Description
-This is a tic tac toe console program that allows the user to play against another user or a computer, with timer options.
+This is a tic tac toe GUI program that allows the user to play against another user or a computer, with timer options.
 
 ### How to Compile and Run program (through Eclipse)
 - First download the archive zip file that was submitted to this assignment

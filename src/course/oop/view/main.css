@@ -12,11 +12,11 @@
 
 .settingsPane {
 	-fx-background-color: orange;
-	-fx-color: green;
+	-fx-color: blue
 }
 
 .gamePane {
-	-fx-background-color: purple;
+	-fx-background-color: lime;
 	-fx-color: pink;
 }
 
@@ -34,4 +34,9 @@
 }
 .orangeButton:hover{
 	-fx-color: rgb(255, 0,0);
+}
+
+.titleText{
+	-fx-font-size: 30pt;
+	-fx-font-family: "Elephant";
 }

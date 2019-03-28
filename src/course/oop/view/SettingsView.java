@@ -1,13 +1,21 @@
 package course.oop.view;
 
+
+
+import java.util.HashMap;
+
 import course.oop.controller.TTTControllerImpl;
 import course.oop.storage.RecordManager;
 import course.oop.storage.Records;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
@@ -26,7 +34,9 @@ public class SettingsView extends ViewState {
 
 	public GridPane constructPane() {
 		
-		Text numberPlayersLabel = new Text("Number of Players:");
+		
+		
+		Text numberPlayersLabel = new Text("Number of Players (1: vs computer, 2: vs player):");
 		TextField numberPlayersTextField = new TextField();
 		
 		Text playerOneNameLabel = new Text("Player One Name:");
@@ -57,14 +67,24 @@ public class SettingsView extends ViewState {
            @Override 
            public void handle(MouseEvent e) { 
 
-        	   String numPlayers = numberPlayersTextField.getText();
+        	   String numPlayers = "1"; //default
+        	   if (!numberPlayersTextField.getText().trim().isEmpty()) {
+        		   numPlayers = numberPlayersTextField.getText();
+        	   }
         	   String playerOneName = playerOneNameTextField.getText();
         	   String playerOneMarker = playerOneMarkerTextField.getText();
         	   String playerTwoName = playerTwoNameTextField.getText();
         	   String playerTwoMarker = playerTwoMarkerTextField.getText();
-        	   String playerOrder = playerOrderTextField.getText();
-        	   String time_ = timerTextField.getText();
         	   
+        	   String playerOrder = "1"; //default
+        	   if (!playerOrderTextField.getText().trim().isEmpty()) {
+        		   playerOrder = playerOrderTextField.getText();
+        	   }
+        	   
+        	   String time_ = "0"; //default
+        	   if (!timerTextField.getText().trim().isEmpty()) {
+        		   time_ = timerTextField.getText();
+        	   }
   
         	   StateMachine machine = getMachine();
         	   RecordManager records = getRecordManager();
@@ -98,7 +118,7 @@ public class SettingsView extends ViewState {
 	       	        }
 	       	        
 	       	        
-	       	        TTTController.startNewGame(Integer.parseInt(numPlayers), Integer.parseInt(time_));
+	       	        
 
 	       	   }catch(NumberFormatException nfe) {
 	       			//text = "Please enter integer values!";
@@ -170,21 +190,105 @@ public class SettingsView extends ViewState {
         gridPane.add(button2, 1, 0);
         
         
+        
+        Text recordsLabel = new Text("Player Records:");
+        gridPane.add(recordsLabel, 0, 8);
+        
         RecordManager records = getRecordManager();
-        Text[] dataLabels = new Text[10];
+        Text[] dataLabels = new Text[records.getRecords().size()];
 		int i = 0;
 		for (String s : records.getRecords().keySet()) {
 			Records r = records.getRecords().get(s);
 			dataLabels[i] = new Text("Name: " + r.getName() + " Marker: " + r.getMarker() + " Wins: " + r.getWins() + " Losses: " + r.getLosses() + " Ties: " + r.getTies());
-			gridPane.add(dataLabels[i], 0, i + 8);
+			gridPane.add(dataLabels[i], 0, i + 9);
 			i++;
-			if (i == 10) {
+			/*if (i == 10) {
 				break;
-			}
+			}*/
 		}
 		
+		Text playerOneSelect = new Text("Player One Select:");
+		gridPane.add(playerOneSelect, 0, i+10);
+		
+		HashMap<String, Records> map = records.getRecords();
+
+		map.remove("Computer");
+		
+		ComboBox combo_box1 = new ComboBox(FXCollections.observableArrayList(map.keySet())); 
+        gridPane.add(combo_box1, 1, i+10);
         
-              
+        
+        Text playerTwoSelect = new Text("Player Two Select:");
+		gridPane.add(playerTwoSelect, 0, i+11);
+        
+		ComboBox combo_box2 = new ComboBox(FXCollections.observableArrayList(map.keySet())); 
+        gridPane.add(combo_box2, 1, i+11);
+		
+        
+       
+	
+		
+		String[] emojis = {"❤","😃","👍","😁","😂","😘"};
+		
+        ComboBox combo_box3 = new ComboBox(FXCollections.observableArrayList(emojis)); 
+        gridPane.add(combo_box3, 2, i+12);
+        
+      
+        
+        Button emojiSelect1 = new Button("Player One Emoji Select");
+        Button emojiSelect2 = new Button("Player Two Emoji Select");
+        
+        
+		gridPane.add(emojiSelect1, 0, i+12);
+		gridPane.add(emojiSelect2, 1, i+12);
+		
+		
+        
+        
+        EventHandler<ActionEvent> event1 = new EventHandler<ActionEvent>() { 
+          public void handle(ActionEvent e) 
+          { 
+              String name = (String) combo_box1.getValue();
+              playerOneNameTextField.setText(name);
+              playerOneMarkerTextField.setText(records.getRecords().get(name).getMarker());
+          } 
+        }; 
+        
+        
+        EventHandler<ActionEvent> event2 = new EventHandler<ActionEvent>() { 
+            public void handle(ActionEvent e) 
+            { 
+                String name = (String) combo_box2.getValue();
+                playerTwoNameTextField.setText(name);
+                playerTwoMarkerTextField.setText(records.getRecords().get(name).getMarker());
+            } 
+          }; 
+          
+          
+         
+          EventHandler<MouseEvent> eventHandlerEmoji1 = new EventHandler<MouseEvent>() { 
+              @Override 
+              public void handle(MouseEvent e) { 
+              	playerOneMarkerTextField.setText((String)combo_box3.getValue());
+           	  
+           	   
+              } 
+           };
+  		
+           EventHandler<MouseEvent> eventHandlerEmoji2 = new EventHandler<MouseEvent>() { 
+               @Override 
+               public void handle(MouseEvent e) { 
+            	   playerTwoMarkerTextField.setText((String)combo_box3.getValue());
+            	   
+               } 
+            };
+          
+          
+        emojiSelect1.addEventFilter(MouseEvent.MOUSE_CLICKED, eventHandlerEmoji1);
+        emojiSelect2.addEventFilter(MouseEvent.MOUSE_CLICKED, eventHandlerEmoji2);
+        combo_box1.setOnAction(event1);
+        combo_box2.setOnAction(event2);
+        
         return gridPane;
 	}
 	

@@ -62,6 +62,8 @@ public class GameView extends ViewState {
         gridPane.getStyleClass().add("gamePane");
         
         
+        
+        
         EventHandler<MouseEvent> eventHandlerb1 = new EventHandler<MouseEvent>() { 
             @Override 
             public void handle(MouseEvent e) { 
@@ -332,7 +334,7 @@ public class GameView extends ViewState {
 			
 			timerCancel();
 			gameState = 2;
-			statusLabel.setText(TTTController.getPlayers()[gamePlayerTurn - 1].getName() + " took too long! " + TTTController.getPlayers()[3- gamePlayerTurn - 1].getName() + " won!");
+			statusLabel.setText(TTTController.getPlayers()[gamePlayerTurn - 1].getName() + " timed out! " + TTTController.getPlayers()[3- gamePlayerTurn - 1].getName() + " won!");
 			//ticTacToePane.add(statusLabel, 4, 0);
 			
 			RotateTransition rotateTransition= new RotateTransition(); 
@@ -346,11 +348,10 @@ public class GameView extends ViewState {
 			rotateTransition.setCycleCount(5); 
 			//Playing the animation 
 			rotateTransition.play(); 
+			int winner = 3 - gamePlayerTurn;
 			
-			AudioClip plonkSound = new AudioClip(Paths.get("TaDa.mp3").toUri().toString());
-			plonkSound.play();
-			
-			addRecords(3- gamePlayerTurn);
+			playSound(winner);
+			addRecords(winner);
 			
 			
 		}
@@ -388,7 +389,7 @@ public class GameView extends ViewState {
 				
 			case 1:
 				statusLabel.setText(TTTController.getPlayers()[0].getName() + " won!");
-
+				
 				
 				break;
 			case 2:
@@ -417,8 +418,7 @@ public class GameView extends ViewState {
 			
 			
 			
-			AudioClip plonkSound = new AudioClip(Paths.get("TaDa.mp3").toUri().toString());
-			plonkSound.play();
+			playSound(winner);
 			
 			//ticTacToePane.add(statusLabel, 4, 0);
 			addRecords(winner);
@@ -506,7 +506,7 @@ public class GameView extends ViewState {
 		
 	
 		String playerTwo = TTTController.getPlayers()[1].getName();
-		String playerTwoMarker = TTTController.getPlayers()[0].getMarker();
+		String playerTwoMarker = TTTController.getPlayers()[1].getMarker();
 		
 		int twoWins;
 		int twoLosses;
@@ -563,6 +563,26 @@ public class GameView extends ViewState {
 		
 		
 		getRecordManager().writeBack();
+		
+	}
+	
+	private void playSound(int winner) {
+		if (winner == 3) {
+			AudioClip plonkSound = new AudioClip(Paths.get("resources/Tied.mp3").toUri().toString());
+			plonkSound.play();
+		}
+		else if (computerPlaying == true && winner == computerNumber) {
+			AudioClip plonkSound = new AudioClip(Paths.get("resources/Sad.mp3").toUri().toString());
+			plonkSound.play();
+		}
+		else if (computerPlaying == true) {
+			AudioClip plonkSound = new AudioClip(Paths.get("resources/TaDa.mp3").toUri().toString());
+			plonkSound.play();
+		}
+		else {
+			AudioClip plonkSound = new AudioClip(Paths.get("resources/TaDa.mp3").toUri().toString());
+			plonkSound.play();
+		}
 		
 	}
 

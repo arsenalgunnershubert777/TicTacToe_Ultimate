@@ -33,6 +33,10 @@ public class RecordManager {
 		return records;
 	}
 	
+	public void clearRecords() {
+		records.clear();
+	}
+	
 	public void writeBack() {
 		try
         {

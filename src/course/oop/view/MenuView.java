@@ -1,6 +1,10 @@
 package course.oop.view;
 
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.nio.file.Paths;
+
 import course.oop.storage.RecordManager;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
@@ -8,6 +12,8 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.shape.Line;
@@ -27,8 +33,15 @@ public class MenuView extends ViewState {
 		
         Button button1 = new Button("Play Game"); 
         Button button2 = new Button("Quit Game"); 
-       
-
+        Button buttonRecords = new Button("Clear Records"); 
+        buttonRecords.setOnMouseClicked(new EventHandler<MouseEvent>() {
+        	@Override public void handle(MouseEvent e) {
+        		getRecordManager().clearRecords();
+        	}
+        });
+        
+        Text titleLabel = new Text("Welcome to TicTacToe!");
+		titleLabel.getStyleClass().add("titleText");
         
         //Creating the mouse event handler 
         EventHandler<MouseEvent> eventHandler = new EventHandler<MouseEvent>() { 
@@ -55,12 +68,23 @@ public class MenuView extends ViewState {
         //Registering the event filter 
         button1.addEventFilter(MouseEvent.MOUSE_CLICKED, eventHandler);
         button2.addEventFilter(MouseEvent.MOUSE_CLICKED, eventHandler2);   
-
+        
         //Creating a Grid Pane 
         GridPane gridPane = new GridPane();    
         gridPane.getStyleClass().add("menuPane");
         //Setting size for the pane 
         gridPane.setMinSize(windowWidth, (int) windowHeight/4); 
+        
+        
+        
+        ImageView image = null;
+		try {
+			image = new ImageView(new Image(new FileInputStream("resources/TTT.PNG")));
+		} catch (FileNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+        gridPane.add(image, 0, 1);
         
         //Setting the padding  
         gridPane.setPadding(new Insets(10, 10, 10, 10)); 
@@ -72,8 +96,10 @@ public class MenuView extends ViewState {
         //Setting the Grid alignment 
         gridPane.setAlignment(Pos.CENTER); 
         
-        gridPane.add(button1, 0, 0); 
-        gridPane.add(button2, 1, 0);
+        gridPane.add(titleLabel, 0, 0);
+        gridPane.add(button1, 0, 2); 
+        gridPane.add(button2, 0, 3);
+        gridPane.add(buttonRecords, 1, 2);
       
               
         return gridPane;

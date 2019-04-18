@@ -65,7 +65,7 @@ public class MainView {
 		
 		//this.root.setTop(this.buildSetupPane());
 		
-		//test2
+		//test22
 	}
 	
 	public Scene getMainScene() {

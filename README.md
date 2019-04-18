@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # TicTacToe
 ### Description
 This is a tic tac toe GUI program that allows the user to play against another user or a computer, with timer options.
@@ -36,3 +37,6 @@ This is a tic tac toe GUI program that allows the user to play against another u
 #### Creator Contact
 - If there are any issues, or clarifications needed, for the compile, run, or play of this game, please contact me at hubert777@ufl.edu, or 407-765-8806
 - Thanks and enjoy!
+=======
+# TicTacToe_Ultimate
+>>>>>>> branch 'master' of https://github.com/arsenalgunnershubert777/TicTacToe_Ultimate.git

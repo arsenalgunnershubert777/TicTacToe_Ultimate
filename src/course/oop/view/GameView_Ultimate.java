@@ -7,6 +7,7 @@ import java.util.TimerTask;
 
 import course.oop.computer.Computer;
 import course.oop.controller.TTTControllerImpl;
+import course.oop.controller.TTTControllerImpl_Ultimate;
 import course.oop.storage.RecordManager;
 import course.oop.storage.Records;
 import javafx.animation.AnimationTimer;
@@ -23,27 +24,31 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.media.AudioClip;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Rotate;
 import javafx.util.Duration;
 
-public class GameView extends ViewState {
+public class GameView_Ultimate extends ViewState {
 	private final int windowWidth = 1000;
     private final int windowHeight = 900;
-    private TTTControllerImpl TTTController;
+    private TTTControllerImpl_Ultimate TTTController;
     private boolean computerPlaying = false;
     private int computerNumber = 0;
     private Text statusLabel = new Text(10, 50,"");
     private Computer computer = new Computer();
     private int gameState = 0;
     private int gamePlayerTurn = 1;
-    private Button[] buttons =  new Button[9];
+    private Button[] buttons;
+    private int[][] statusDone;
     private int time = 0;
     private Timer turnTimer;
     private TimerTask task;
+    private Rectangle[] r = new Rectangle[9];
     
-	public GameView(StateMachine machine, RecordManager records, TTTControllerImpl TTTController, boolean ComputerPlaying, int ComputerNumber) {
+	public GameView_Ultimate(StateMachine machine, RecordManager records, TTTControllerImpl_Ultimate TTTController, boolean ComputerPlaying, int ComputerNumber) {
 		super(machine, records);
 		this.TTTController = TTTController;
 		this.computerPlaying = ComputerPlaying;
@@ -54,7 +59,8 @@ public class GameView extends ViewState {
 	public GridPane constructPane() {
 		
 		GridPane gridPane = new GridPane(); 
-       
+		
+		
         Button button1 = new Button("Return to Menu"); 
         Button button2 = new Button("Play again with different Settings");
         Button button3 = new Button("Play again with same settings");
@@ -98,8 +104,8 @@ public class GameView extends ViewState {
            	   if (computerPlaying) {
            		   numPlayers = 1;
            	   }
-           	   TTTController.startNewGame(numPlayers, time, 3, false);
-          	   machine.removeStateWithReplace(new GameView(machine, records, TTTController, computerPlaying, computerNumber));
+           	   TTTController.startNewGame(numPlayers, time);
+          	   machine.removeStateWithReplace(new GameView_Ultimate(machine, records, TTTController, computerPlaying, computerNumber));
            	   
               } 
            };
@@ -109,9 +115,9 @@ public class GameView extends ViewState {
         button3.addEventFilter(MouseEvent.MOUSE_CLICKED, eventHandlerb3);  
         
         
-        gridPane.add(button1, 4, 2);
-        gridPane.add(button2, 4, 1);
-        gridPane.add(button3, 4, 0);
+        gridPane.add(button1, 9+1, 2);
+        gridPane.add(button2, 9+1, 1);
+        gridPane.add(button3, 9+1, 0);
         //Creating a Grid Pane 
           
         
@@ -128,161 +134,80 @@ public class GameView extends ViewState {
         //Setting the Grid alignment 
         gridPane.setAlignment(Pos.CENTER); 
         
+        
+        EventHandler<MouseEvent>[] buttonHandlers = new EventHandler[81];
+        
+        for (int i = 0; i < 81;i++) {
+        	final int sq_row = i/27;
+        	final int sq_col = (i-sq_row*27)/9;
+        	final int pos_row = (i - sq_row*27 - sq_col*9)/3;
+        	final int pos_col = (i - sq_row*27 - sq_col*9)%3;
+        	buttonHandlers[i] = new EventHandler<MouseEvent>() {
+        		
+        		public void handle(MouseEvent e) { 
+        			
+                	if (gamePlayerTurn != computerNumber && gameState == 1) {
+                		if (TTTController.setSelection(sq_row, sq_col, pos_row, pos_col, gamePlayerTurn)) {
+     	            	   gamePlayerTurn = 3 - gamePlayerTurn;
+     		               if (time > 0) {
+     		            	   timerCancel();
+     		            	   timerSet();
+     		               }
+     	               }
+                	}
+                }
+        	};
+        }
        
         
-        EventHandler<MouseEvent> eventHandler0 = new EventHandler<MouseEvent>() { 
-            @Override 
-            public void handle(MouseEvent e) { 
-            	if (gamePlayerTurn != computerNumber && gameState == 1) {
-            		if (TTTController.setSelection(0, 0, gamePlayerTurn)) {
- 	            	   gamePlayerTurn = 3 - gamePlayerTurn;
- 		               if (time > 0) {
- 		            	   timerCancel();
- 		            	   timerSet();
- 		               }
- 	               }
-            	}
-            } 
-        };
-        EventHandler<MouseEvent> eventHandler1 = new EventHandler<MouseEvent>() { 
-            @Override 
-            public void handle(MouseEvent e) { 
-            	if (gamePlayerTurn != computerNumber && gameState == 1) {
-	               if (TTTController.setSelection(0, 1, gamePlayerTurn)) {
-	            	   gamePlayerTurn = 3 - gamePlayerTurn;
-		               if (time > 0) {
-		            	   timerCancel();
-		            	   timerSet();
-		               }
-	               }
-	               
-            	}
-            }  
-        };
-        EventHandler<MouseEvent> eventHandler2 = new EventHandler<MouseEvent>() { 
-            @Override 
-            public void handle(MouseEvent e) { 
-            	if (gamePlayerTurn != computerNumber && gameState == 1) {
-            		if (TTTController.setSelection(0, 2, gamePlayerTurn)) {
- 	            	   gamePlayerTurn = 3 - gamePlayerTurn;
- 		               if (time > 0) {
- 		            	   timerCancel();
- 		            	   timerSet();
- 		               }
- 	               }
-            	}
-            }  
-        };
-        EventHandler<MouseEvent> eventHandler3 = new EventHandler<MouseEvent>() { 
-            @Override 
-            public void handle(MouseEvent e) { 
-            	if (gamePlayerTurn != computerNumber && gameState == 1) {
-            		if (TTTController.setSelection(1, 0, gamePlayerTurn)) {
- 	            	   gamePlayerTurn = 3 - gamePlayerTurn;
- 		               if (time > 0) {
- 		            	   timerCancel();
- 		            	   timerSet();
- 		               }
- 	               }
-            	}
-            }  
-        };
        
-        EventHandler<MouseEvent> eventHandler4 = new EventHandler<MouseEvent>() { 
-            @Override 
-            public void handle(MouseEvent e) { 
-            	if (gamePlayerTurn != computerNumber && gameState == 1) {
-            		if (TTTController.setSelection(1, 1, gamePlayerTurn)) {
- 	            	   gamePlayerTurn = 3 - gamePlayerTurn;
- 		               if (time > 0) {
- 		            	   timerCancel();
- 		            	   timerSet();
- 		               }
- 	               }
-            	}
-            } 
-        };
-       
-        EventHandler<MouseEvent> eventHandler5 = new EventHandler<MouseEvent>() { 
-            @Override 
-            public void handle(MouseEvent e) { 
-            	if (gamePlayerTurn != computerNumber && gameState == 1) {
-            		if (TTTController.setSelection(1, 2, gamePlayerTurn)) {
- 	            	   gamePlayerTurn = 3 - gamePlayerTurn;
- 		               if (time > 0) {
- 		            	   timerCancel();
- 		            	   timerSet();
- 		               }
- 	               }
-            	}
-            } 
-        };
-        EventHandler<MouseEvent> eventHandler6 = new EventHandler<MouseEvent>() { 
-            @Override 
-            public void handle(MouseEvent e) { 
-            	if (gamePlayerTurn != computerNumber && gameState == 1) {
-            		if (TTTController.setSelection(2, 0, gamePlayerTurn)) {
- 	            	   gamePlayerTurn = 3 - gamePlayerTurn;
- 		               if (time > 0) {
- 		            	   timerCancel();
- 		            	   timerSet();
- 		               }
- 	               }
-            	}
-            } 
-        };
-        EventHandler<MouseEvent> eventHandler7 = new EventHandler<MouseEvent>() { 
-            @Override 
-            public void handle(MouseEvent e) { 
-            	if (gamePlayerTurn != computerNumber && gameState == 1) {
-            		if (TTTController.setSelection(2, 1, gamePlayerTurn)) {
- 	            	   gamePlayerTurn = 3 - gamePlayerTurn;
- 		               if (time > 0) {
- 		            	   timerCancel();
- 		            	   timerSet();
- 		               }
- 	               }
-            	}
-            }  
-        };
-        EventHandler<MouseEvent> eventHandler8 = new EventHandler<MouseEvent>() { 
-            @Override 
-            public void handle(MouseEvent e) { 
-            	if (gamePlayerTurn != computerNumber && gameState == 1) {
-            		if (TTTController.setSelection(2, 2, gamePlayerTurn)) {
- 	            	   gamePlayerTurn = 3 - gamePlayerTurn;
- 		               if (time > 0) {
- 		            	   timerCancel();
- 		            	   timerSet();
- 		               }
- 	               }
-            	}
-            } 
-        };
         
-      
         
+        
+        Rectangle b = new Rectangle();
+
+    	b.setWidth(715);
+        b.setHeight(715);
+        b.setArcWidth(20);
+        b.setArcHeight(20);
+        b.setFill(Color.RED);
+        gridPane.add(b, 0, 0, 9,9);
         
         
         for (int i = 0; i < 9; i++) {
+        	r[i] = new Rectangle();
+        	r[i].setWidth(235);
+            r[i].setHeight(235);
+            r[i].setArcWidth(20);
+            r[i].setArcHeight(20);
+            r[i].setFill(Color.AQUA);
+            gridPane.add(r[i], (i%3)*3, (i/3)*3, 3,3);
+        }
+        
+        
+        statusDone = new int[3][3];
+        
+        buttons =  new Button[81];
+        for (int i = 0; i < 81; i++) {
 			buttons[i] = new Button(" ");
 			buttons[i].getStyleClass().add("tileButton");
 			
 			//buttons[i].setText(" ");
-			gridPane.add(buttons[i], i%3, i/3);
+			
+			int sq_row = i/27;
+			int sq_col = (i-sq_row*27)/9;
+			int row = (i - sq_row*27 - sq_col*9)/3 + sq_row*3;
+        	int col = (i - sq_row*27 - sq_col*9)%3 + sq_col*3;
+			
+			gridPane.add(buttons[i], row, col);
+			buttons[i].addEventFilter(MouseEvent.MOUSE_CLICKED, buttonHandlers[i]);
 		}
-        gridPane.add(statusLabel, 3, 0);
         
-        buttons[0].addEventFilter(MouseEvent.MOUSE_CLICKED, eventHandler0);
-        buttons[1].addEventFilter(MouseEvent.MOUSE_CLICKED, eventHandler1);
-        buttons[2].addEventFilter(MouseEvent.MOUSE_CLICKED, eventHandler2);
-        buttons[3].addEventFilter(MouseEvent.MOUSE_CLICKED, eventHandler3);
-        buttons[4].addEventFilter(MouseEvent.MOUSE_CLICKED, eventHandler4);
-        buttons[5].addEventFilter(MouseEvent.MOUSE_CLICKED, eventHandler5);
-        buttons[6].addEventFilter(MouseEvent.MOUSE_CLICKED, eventHandler6);
-        buttons[7].addEventFilter(MouseEvent.MOUSE_CLICKED, eventHandler7);
-        buttons[8].addEventFilter(MouseEvent.MOUSE_CLICKED, eventHandler8);
         
+        
+        gridPane.add(statusLabel, 9, 0);
+
+		
         AnimationTimer timer = new AnimationTimer() {
             @Override
             public void handle(long now) {
@@ -354,80 +279,185 @@ public class GameView extends ViewState {
 			
 		}
 		
-		int[][] board = TTTController.getBoard();
+		int[][][][] board = TTTController.getBoard();
 		if (gameState == 1) {
 			
-			for (int i = 0; i < 9; i++) {
+			
+			int winner = TTTController.determineWinner();
+			if (winner != 0 && gameState != 2) {
 				
-				int state = (board[i/3][i%3]);
-				String marker = " ";
-				if (state == 0) {
-					marker = " ";
+				if (time > 0) {
+					timerCancel();
 				}
-				else if (state == 1) {
-					marker = TTTController.getPlayers()[0].getMarker();
+				gameState = 2;
+				
+				//Text statusLabel = new Text("");
+				
+				switch (winner) {
+					
+				case 1:
+					statusLabel.setText(TTTController.getPlayers()[0].getName() + " won!");
+					
+					
+					break;
+				case 2:
+					statusLabel.setText(TTTController.getPlayers()[1].getName() + " won!");
+					
+					break;
+				case 3:
+					statusLabel.setText("It's a tie!");
+					
+					break;
 				}
-				else if (state == 2) {
-					marker = TTTController.getPlayers()[1].getMarker();
-				}
-				buttons[i].setText(marker); 
+				
+				RotateTransition rotateTransition= new RotateTransition(); 
+				//Setting the duration for the transition 
+				rotateTransition.setDuration(Duration.millis(1000)); 
+				//Setting the node for the transition 
+				rotateTransition.setNode(statusLabel);       
+				//Setting the angle of the rotation 
+				rotateTransition.setByAngle(360); 
+				//Setting the cycle count for the transition 
+				rotateTransition.setCycleCount(5); 
+				//Playing the animation 
+				rotateTransition.play(); 
+				
+				
+				
+				
+				
+				playSound(winner);
+				
+				//ticTacToePane.add(statusLabel, 4, 0);
+				addRecords(winner);
+				
 			}
+			
+			
+			
+			
+			
+			
+			for (int i = 0; i < 3; i++) {
+				for (int j = 0; j < 3; j++) {
+					for (int k = 0; k<3; k++) {
+						for (int l = 0; l < 3; l++) {
+							int state = board[i][j][k][l];
+							String marker = " ";
+							if (state == 0) {
+								marker = " ";
+							}
+							else if (state == 1) {
+								marker = TTTController.getPlayers()[0].getMarker();
+							}
+							else if (state == 2) {
+								marker = TTTController.getPlayers()[1].getMarker();
+							}
+							int index = i*27 + j*9 + k*3 + l;
+							buttons[index].setText(marker);
+						}
+					}
+				}
+			}
+			int[] toPlay = TTTController.getToPlay();
+			int[][] boardStatus = TTTController.getBoardStatus();
+			
+			
+
+			if (toPlay[0] == -1 && toPlay[1] == -1) {
+				for (int i = 0; i < 9; i++) {
+					if (boardStatus[i/3][i%3] == 0) {
+						for (int j = 0; j < 9; j++) {
+							buttons[i*9 +j].getStyleClass().removeAll("tileButton", "tileButtonFree");
+							buttons[i*9 +j].getStyleClass().add("tileButtonFree");
+						}
+					}
+					else if (boardStatus[i/3][i%3] == 1){
+						for (int j = 0; j < 9; j++) {
+							buttons[i*9 +j].getStyleClass().removeAll("tileButton", "tileButtonFree");
+							buttons[i*9 +j].getStyleClass().add("tileButtonOne");
+						}
+					}
+					else if (boardStatus[i/3][i%3] == 2){
+						for (int j = 0; j < 9; j++) {
+							buttons[i*9 +j].getStyleClass().removeAll("tileButton", "tileButtonFree");
+							buttons[i*9 +j].getStyleClass().add("tileButtonTwo");
+						}
+					}
+					else if (boardStatus[i/3][i%3] == 3){
+						for (int j = 0; j < 9; j++) {
+							buttons[i*9 +j].getStyleClass().removeAll("tileButton", "tileButtonFree");
+							buttons[i*9 +j].getStyleClass().add("tileButtonTie");
+						}
+					}
+				}
+			}
+			else {
+
+				for (int i = 0; i < 9; i++) {
+					if (i/3 == toPlay[0] && i%3 == toPlay[1] && boardStatus[toPlay[0]][toPlay[1]] == 0) {
+
+						for (int j = 0; j < 9; j++) {
+							buttons[i*9 +j].getStyleClass().removeAll("tileButton", "tileButtonFree");
+							buttons[i*9 +j].getStyleClass().add("tileButtonFree");
+						}
+					}
+					else if (boardStatus[i/3][i%3] == 1){
+
+						for (int j = 0; j < 9; j++) {
+							buttons[i*9 +j].getStyleClass().removeAll("tileButton", "tileButtonFree");
+							buttons[i*9 +j].getStyleClass().add("tileButtonOne");
+						}
+					}
+					else if (boardStatus[i/3][i%3] == 2) {
+						for (int j = 0; j < 9; j++) {
+							buttons[i*9 +j].getStyleClass().removeAll("tileButton", "tileButtonFree");
+							buttons[i*9 +j].getStyleClass().add("tileButtonTwo");
+						}
+					}
+					else if (boardStatus[i/3][i%3] == 0){
+						for (int j = 0; j < 9; j++) {
+							buttons[i*9 +j].getStyleClass().removeAll("tileButton", "tileButtonFree");
+							buttons[i*9 +j].getStyleClass().add("tileButton");
+						}
+						
+					}
+					else if (boardStatus[i/3][i%3] == 3) {
+						for (int j = 0; j < 9; j++) {
+							buttons[i*9 +j].getStyleClass().removeAll("tileButton", "tileButtonFree");
+							buttons[i*9 +j].getStyleClass().add("tileButtonTie");
+						}
+					}
+				}
+				
+				
+			}
+			
 		}
-		int winner = TTTController.determineWinner();
-		if (winner != 0 && gameState != 2) {
-			
-			if (time > 0) {
-				timerCancel();
+		
+		
+		/*int[][] boardStat = TTTController.getBoardStatus();
+		for (int i = 0; i < 9; i++) {
+			if (statusDone[i/3][i%3] != 0) {
+				continue;
 			}
-			gameState = 2;
-			
-			//Text statusLabel = new Text("");
-			
-			switch (winner) {
+			int status = boardStat[i/3][i%3]; 
+			if (status == 1) {
 				
-			case 1:
-				statusLabel.setText(TTTController.getPlayers()[0].getName() + " won!");
-				
-				
-				break;
-			case 2:
-				statusLabel.setText(TTTController.getPlayers()[1].getName() + " won!");
-				
-				break;
-			case 3:
-				statusLabel.setText("It's a tie!");
-				
-				break;
 			}
-			
-			RotateTransition rotateTransition= new RotateTransition(); 
-			//Setting the duration for the transition 
-			rotateTransition.setDuration(Duration.millis(1000)); 
-			//Setting the node for the transition 
-			rotateTransition.setNode(statusLabel);       
-			//Setting the angle of the rotation 
-			rotateTransition.setByAngle(360); 
-			//Setting the cycle count for the transition 
-			rotateTransition.setCycleCount(5); 
-			//Playing the animation 
-			rotateTransition.play(); 
-			
-			
-			
-			
-			
-			playSound(winner);
-			
-			//ticTacToePane.add(statusLabel, 4, 0);
-			addRecords(winner);
-			
-		}
+			else if (status == 2) {
+				
+			}
+		}*/
+		
 		
 		
 		
 		if (computerPlaying && (gamePlayerTurn == computerNumber) && gameState == 1) {
-			int[] nextMove = computer.getNextMove(computerNumber, TTTController.getBoard());
-			TTTController.setSelection(nextMove[0], nextMove[1], computerNumber);
+			int[] toPlay = TTTController.getToPlay();
+			int[][] boardStatus = TTTController.getBoardStatus();
+			int[][] nextMove = computer.getNextMove(computerNumber, TTTController.getBoard(), toPlay,boardStatus);
+			TTTController.setSelection(nextMove[0][0], nextMove[0][1], nextMove[1][0], nextMove[1][1], computerNumber);
 			gamePlayerTurn = 3 - gamePlayerTurn;
 			if (time > 0) {
 				timerCancel();

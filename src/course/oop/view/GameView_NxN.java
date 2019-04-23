@@ -28,7 +28,7 @@ import javafx.scene.text.Text;
 import javafx.scene.transform.Rotate;
 import javafx.util.Duration;
 
-public class GameView extends ViewState {
+public class GameView_NxN extends ViewState {
 	private final int windowWidth = 1000;
     private final int windowHeight = 900;
     private TTTControllerImpl TTTController;
@@ -38,17 +38,23 @@ public class GameView extends ViewState {
     private Computer computer = new Computer();
     private int gameState = 0;
     private int gamePlayerTurn = 1;
-    private Button[] buttons =  new Button[9];
+    private Button[] buttons;
     private int time = 0;
     private Timer turnTimer;
     private TimerTask task;
+    private int diff_level = 0;
+    private int n = 3;
+    private boolean random = false;
     
-	public GameView(StateMachine machine, RecordManager records, TTTControllerImpl TTTController, boolean ComputerPlaying, int ComputerNumber) {
+	public GameView_NxN(StateMachine machine, RecordManager records, TTTControllerImpl TTTController, boolean ComputerPlaying, int ComputerNumber, int computerLevel, int n, boolean random) {
 		super(machine, records);
 		this.TTTController = TTTController;
 		this.computerPlaying = ComputerPlaying;
 		this.computerNumber = ComputerNumber;
 		this.time = TTTController.getTimeOut();
+		this.diff_level = computerLevel;
+		this.n = n;
+		this.random = random;
 		
 	}
 	public GridPane constructPane() {
@@ -98,8 +104,8 @@ public class GameView extends ViewState {
            	   if (computerPlaying) {
            		   numPlayers = 1;
            	   }
-           	   TTTController.startNewGame(numPlayers, time, 3, false);
-          	   machine.removeStateWithReplace(new GameView(machine, records, TTTController, computerPlaying, computerNumber));
+           	   TTTController.startNewGame(numPlayers, time, n, random);
+          	   machine.removeStateWithReplace(new GameView_NxN(machine, records, TTTController, computerPlaying, computerNumber, diff_level, n, random));
            	   
               } 
            };
@@ -109,9 +115,9 @@ public class GameView extends ViewState {
         button3.addEventFilter(MouseEvent.MOUSE_CLICKED, eventHandlerb3);  
         
         
-        gridPane.add(button1, 4, 2);
-        gridPane.add(button2, 4, 1);
-        gridPane.add(button3, 4, 0);
+        gridPane.add(button1, n+1, 2);
+        gridPane.add(button2, n+1, 1);
+        gridPane.add(button3, n+1, 0);
         //Creating a Grid Pane 
           
         
@@ -128,160 +134,44 @@ public class GameView extends ViewState {
         //Setting the Grid alignment 
         gridPane.setAlignment(Pos.CENTER); 
         
+        
+        EventHandler<MouseEvent>[] buttonHandlers = new EventHandler[n*n];
+        
+        for (int i = 0; i < n*n;i++) {
+        	final int row = i/n;
+        	final int col = i%n;
+        	buttonHandlers[i] = new EventHandler<MouseEvent>() {
+        		
+        		public void handle(MouseEvent e) { 
+        			
+                	if (gamePlayerTurn != computerNumber && gameState == 1) {
+                		if (TTTController.setSelection(row, col, gamePlayerTurn)) {
+     	            	   gamePlayerTurn = 3 - gamePlayerTurn;
+     		               if (time > 0) {
+     		            	   timerCancel();
+     		            	   timerSet();
+     		               }
+     	               }
+                	}
+                }
+        	};
+        }
        
         
-        EventHandler<MouseEvent> eventHandler0 = new EventHandler<MouseEvent>() { 
-            @Override 
-            public void handle(MouseEvent e) { 
-            	if (gamePlayerTurn != computerNumber && gameState == 1) {
-            		if (TTTController.setSelection(0, 0, gamePlayerTurn)) {
- 	            	   gamePlayerTurn = 3 - gamePlayerTurn;
- 		               if (time > 0) {
- 		            	   timerCancel();
- 		            	   timerSet();
- 		               }
- 	               }
-            	}
-            } 
-        };
-        EventHandler<MouseEvent> eventHandler1 = new EventHandler<MouseEvent>() { 
-            @Override 
-            public void handle(MouseEvent e) { 
-            	if (gamePlayerTurn != computerNumber && gameState == 1) {
-	               if (TTTController.setSelection(0, 1, gamePlayerTurn)) {
-	            	   gamePlayerTurn = 3 - gamePlayerTurn;
-		               if (time > 0) {
-		            	   timerCancel();
-		            	   timerSet();
-		               }
-	               }
-	               
-            	}
-            }  
-        };
-        EventHandler<MouseEvent> eventHandler2 = new EventHandler<MouseEvent>() { 
-            @Override 
-            public void handle(MouseEvent e) { 
-            	if (gamePlayerTurn != computerNumber && gameState == 1) {
-            		if (TTTController.setSelection(0, 2, gamePlayerTurn)) {
- 	            	   gamePlayerTurn = 3 - gamePlayerTurn;
- 		               if (time > 0) {
- 		            	   timerCancel();
- 		            	   timerSet();
- 		               }
- 	               }
-            	}
-            }  
-        };
-        EventHandler<MouseEvent> eventHandler3 = new EventHandler<MouseEvent>() { 
-            @Override 
-            public void handle(MouseEvent e) { 
-            	if (gamePlayerTurn != computerNumber && gameState == 1) {
-            		if (TTTController.setSelection(1, 0, gamePlayerTurn)) {
- 	            	   gamePlayerTurn = 3 - gamePlayerTurn;
- 		               if (time > 0) {
- 		            	   timerCancel();
- 		            	   timerSet();
- 		               }
- 	               }
-            	}
-            }  
-        };
        
-        EventHandler<MouseEvent> eventHandler4 = new EventHandler<MouseEvent>() { 
-            @Override 
-            public void handle(MouseEvent e) { 
-            	if (gamePlayerTurn != computerNumber && gameState == 1) {
-            		if (TTTController.setSelection(1, 1, gamePlayerTurn)) {
- 	            	   gamePlayerTurn = 3 - gamePlayerTurn;
- 		               if (time > 0) {
- 		            	   timerCancel();
- 		            	   timerSet();
- 		               }
- 	               }
-            	}
-            } 
-        };
-       
-        EventHandler<MouseEvent> eventHandler5 = new EventHandler<MouseEvent>() { 
-            @Override 
-            public void handle(MouseEvent e) { 
-            	if (gamePlayerTurn != computerNumber && gameState == 1) {
-            		if (TTTController.setSelection(1, 2, gamePlayerTurn)) {
- 	            	   gamePlayerTurn = 3 - gamePlayerTurn;
- 		               if (time > 0) {
- 		            	   timerCancel();
- 		            	   timerSet();
- 		               }
- 	               }
-            	}
-            } 
-        };
-        EventHandler<MouseEvent> eventHandler6 = new EventHandler<MouseEvent>() { 
-            @Override 
-            public void handle(MouseEvent e) { 
-            	if (gamePlayerTurn != computerNumber && gameState == 1) {
-            		if (TTTController.setSelection(2, 0, gamePlayerTurn)) {
- 	            	   gamePlayerTurn = 3 - gamePlayerTurn;
- 		               if (time > 0) {
- 		            	   timerCancel();
- 		            	   timerSet();
- 		               }
- 	               }
-            	}
-            } 
-        };
-        EventHandler<MouseEvent> eventHandler7 = new EventHandler<MouseEvent>() { 
-            @Override 
-            public void handle(MouseEvent e) { 
-            	if (gamePlayerTurn != computerNumber && gameState == 1) {
-            		if (TTTController.setSelection(2, 1, gamePlayerTurn)) {
- 	            	   gamePlayerTurn = 3 - gamePlayerTurn;
- 		               if (time > 0) {
- 		            	   timerCancel();
- 		            	   timerSet();
- 		               }
- 	               }
-            	}
-            }  
-        };
-        EventHandler<MouseEvent> eventHandler8 = new EventHandler<MouseEvent>() { 
-            @Override 
-            public void handle(MouseEvent e) { 
-            	if (gamePlayerTurn != computerNumber && gameState == 1) {
-            		if (TTTController.setSelection(2, 2, gamePlayerTurn)) {
- 	            	   gamePlayerTurn = 3 - gamePlayerTurn;
- 		               if (time > 0) {
- 		            	   timerCancel();
- 		            	   timerSet();
- 		               }
- 	               }
-            	}
-            } 
-        };
         
-      
+        buttons =  new Button[n*n];
         
         
-        
-        for (int i = 0; i < 9; i++) {
+        for (int i = 0; i < n*n; i++) {
 			buttons[i] = new Button(" ");
 			buttons[i].getStyleClass().add("tileButton");
 			
 			//buttons[i].setText(" ");
-			gridPane.add(buttons[i], i%3, i/3);
+			gridPane.add(buttons[i], i%n, i/n);
+			buttons[i].addEventFilter(MouseEvent.MOUSE_CLICKED, buttonHandlers[i]);
 		}
-        gridPane.add(statusLabel, 3, 0);
-        
-        buttons[0].addEventFilter(MouseEvent.MOUSE_CLICKED, eventHandler0);
-        buttons[1].addEventFilter(MouseEvent.MOUSE_CLICKED, eventHandler1);
-        buttons[2].addEventFilter(MouseEvent.MOUSE_CLICKED, eventHandler2);
-        buttons[3].addEventFilter(MouseEvent.MOUSE_CLICKED, eventHandler3);
-        buttons[4].addEventFilter(MouseEvent.MOUSE_CLICKED, eventHandler4);
-        buttons[5].addEventFilter(MouseEvent.MOUSE_CLICKED, eventHandler5);
-        buttons[6].addEventFilter(MouseEvent.MOUSE_CLICKED, eventHandler6);
-        buttons[7].addEventFilter(MouseEvent.MOUSE_CLICKED, eventHandler7);
-        buttons[8].addEventFilter(MouseEvent.MOUSE_CLICKED, eventHandler8);
+        gridPane.add(statusLabel, n, 0);
         
         AnimationTimer timer = new AnimationTimer() {
             @Override
@@ -357,9 +247,9 @@ public class GameView extends ViewState {
 		int[][] board = TTTController.getBoard();
 		if (gameState == 1) {
 			
-			for (int i = 0; i < 9; i++) {
+			for (int i = 0; i < n*n; i++) {
 				
-				int state = (board[i/3][i%3]);
+				int state = (board[i/n][i%n]);
 				String marker = " ";
 				if (state == 0) {
 					marker = " ";
@@ -426,7 +316,18 @@ public class GameView extends ViewState {
 		
 		
 		if (computerPlaying && (gamePlayerTurn == computerNumber) && gameState == 1) {
-			int[] nextMove = computer.getNextMove(computerNumber, TTTController.getBoard());
+			//int[] nextMove = computer.getNextMove(computerNumber, TTTController.getBoard());
+			int[] nextMove = new int[2];
+			if (diff_level == 0) {
+				nextMove = computer.getNextMove(computerNumber, TTTController.getBoard());
+			}
+			else if (diff_level == 1) {
+				nextMove = computer.getNextMove(computerNumber, TTTController.getBoard(), false);
+			}
+			else if (diff_level == 2) {
+				nextMove = computer.getNextMove(computerNumber, TTTController.getBoard(), true);
+			}
+			
 			TTTController.setSelection(nextMove[0], nextMove[1], computerNumber);
 			gamePlayerTurn = 3 - gamePlayerTurn;
 			if (time > 0) {

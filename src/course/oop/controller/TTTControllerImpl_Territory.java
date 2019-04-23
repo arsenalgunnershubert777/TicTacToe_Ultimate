@@ -3,10 +3,11 @@ import java.util.*;
 
 import course.oop.game.Game;
 import course.oop.game.Game_NxN;
+import course.oop.game.Game_Territory;
 import course.oop.player.Player;
-public class TTTControllerImpl implements TTTControllerInterface {
+public class TTTControllerImpl_Territory implements TTTControllerInterface {
 	//private Game game;
-	private Game_NxN game;
+	private Game_Territory game;
 	private Player[] players = new Player[2];
 	private HashSet<Integer> playerSet = new HashSet<>();
 	private HashSet<String> markerSet = new HashSet<>();
@@ -36,7 +37,7 @@ public class TTTControllerImpl implements TTTControllerInterface {
 			}
 		}
 		//game = new Game(players);
-		game = new Game_NxN(players, n, random);
+		game = new Game_Territory(players);
 		turn = 1;
 		timeOut = timeoutInSecs;
 		

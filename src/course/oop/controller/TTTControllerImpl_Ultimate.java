@@ -1,12 +1,12 @@
 package course.oop.controller;
 import java.util.*;
 
-import course.oop.game.Game;
-import course.oop.game.Game_NxN;
+
+import course.oop.game.Game_Ultimate;
 import course.oop.player.Player;
-public class TTTControllerImpl implements TTTControllerInterface {
+public class TTTControllerImpl_Ultimate {
 	//private Game game;
-	private Game_NxN game;
+	private Game_Ultimate game;
 	private Player[] players = new Player[2];
 	private HashSet<Integer> playerSet = new HashSet<>();
 	private HashSet<String> markerSet = new HashSet<>();
@@ -14,8 +14,8 @@ public class TTTControllerImpl implements TTTControllerInterface {
 	private int timeOut;
 	
 	
-	@Override
-	public void startNewGame(int numPlayers, int timeoutInSecs, int n, boolean random) {
+
+	public void startNewGame(int numPlayers, int timeoutInSecs) {
 		// TODO Auto-generated method stub
 		
 		if (numPlayers == 1) {
@@ -36,7 +36,7 @@ public class TTTControllerImpl implements TTTControllerInterface {
 			}
 		}
 		//game = new Game(players);
-		game = new Game_NxN(players, n, random);
+		game = new Game_Ultimate(players);
 		turn = 1;
 		timeOut = timeoutInSecs;
 		
@@ -49,7 +49,7 @@ public class TTTControllerImpl implements TTTControllerInterface {
 		markerSet.clear();
 	}
 
-	@Override
+
 	public void createPlayer(String username, String marker, int playerNum) {
 		// TODO Auto-generated method stub
 		players[playerNum -1] = new Player(username, marker, playerNum);
@@ -57,10 +57,9 @@ public class TTTControllerImpl implements TTTControllerInterface {
 		markerSet.add(marker);
 	}
 
-	@Override
-	public boolean setSelection(int row, int col, int currentPlayer) {
+	public boolean setSelection(int sq_row, int sq_col, int pos_row, int pos_col, int currentPlayer) {
 		// TODO Auto-generated method stub
-		if (game.setSelection(row, col, currentPlayer)) {
+		if (game.setSelection(sq_row, sq_col, pos_row, pos_col, currentPlayer)) {
 			turn = currentPlayer%2 + 1;
 			
 			return true;
@@ -72,13 +71,12 @@ public class TTTControllerImpl implements TTTControllerInterface {
 		
 	}
 
-	@Override
+
 	public int determineWinner() {
 		// TODO Auto-generated method stub
 		return game.checkState();
 	}
 
-	@Override
 	public String getGameDisplay() {
 		// TODO Auto-generated method stub
 		return game.display();
@@ -94,7 +92,7 @@ public class TTTControllerImpl implements TTTControllerInterface {
 	public Player[] getPlayers() {
 		return players;
 	}
-	public int[][] getBoard() {
+	public int[][][][] getBoard() {
 		return game.getBoard();
 	}
 	public int getTurn() {
@@ -102,5 +100,11 @@ public class TTTControllerImpl implements TTTControllerInterface {
 	}
 	public int getTimeOut() {
 		return timeOut;
+	}
+	public int[] getToPlay() {
+		return game.getToPlay();
+	}
+	public int[][] getBoardStatus() {
+		return game.getBoardStatus();
 	}
 }

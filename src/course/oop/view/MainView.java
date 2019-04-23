@@ -36,7 +36,7 @@ public class MainView {
 	private Scene scene; 
     private TTTControllerImpl TTTController;
 	private Text statusNode;
-    private final int windowWidth = 1000;
+    private final int windowWidth = 1200;
     private final int windowHeight = 900;
     private int gameState = 0;
     private int gamePlayerTurn = 1;

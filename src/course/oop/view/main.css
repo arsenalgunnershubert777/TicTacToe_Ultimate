@@ -31,6 +31,62 @@
     -fx-pref-width: 75px;
     -fx-text-fill: blue;
     -fx-font-size: 20pt;
+    -fx-background-radius: 0;
+    -fx-background-color: grey;
+}
+
+.tileButtonFree {
+	-fx-pref-height: 75px;
+    -fx-pref-width: 75px;
+    -fx-text-fill: blue;
+    -fx-font-size: 20pt;
+    -fx-background-color: yellow;
+    -fx-background-radius: 0;
+}
+
+.tileButtonOne {
+	-fx-pref-height: 75px;
+    -fx-pref-width: 75px;
+    -fx-text-fill: blue;
+    -fx-font-size: 20pt;
+    -fx-background-color: rgb(153,128,230);
+    -fx-background-radius: 0;
+}
+
+.tileButtonTwo {
+	-fx-pref-height: 75px;
+    -fx-pref-width: 75px;
+    -fx-text-fill: blue;
+    -fx-font-size: 20pt;
+    -fx-background-color: rgb(255,179,128);
+    -fx-background-radius: 0;
+}
+
+.tileButtonTie {
+	-fx-pref-height: 75px;
+    -fx-pref-width: 75px;
+    -fx-text-fill: blue;
+    -fx-font-size: 20pt;
+    -fx-background-color:rgb(204,255,204);
+    -fx-background-radius: 0;
+}
+
+.tileButtonNot {
+	-fx-pref-height: 75px;
+    -fx-pref-width: 75px;
+    -fx-text-fill: black;
+    -fx-background-color: red;
+    -fx-font-size: 10pt;
+    -fx-background-radius: 0;
+}
+
+.tileButtonNeutral {
+	-fx-pref-height: 75px;
+    -fx-pref-width: 75px;
+    -fx-text-fill: black;
+    -fx-background-color: green;
+    -fx-font-size: 10pt;
+    -fx-background-radius: 0;
 }
 .orangeButton:hover{
 	-fx-color: rgb(255, 0,0);

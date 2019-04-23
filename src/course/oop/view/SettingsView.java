@@ -5,6 +5,8 @@ package course.oop.view;
 import java.util.HashMap;
 
 import course.oop.controller.TTTControllerImpl;
+import course.oop.controller.TTTControllerImpl_Territory;
+import course.oop.controller.TTTControllerImpl_Ultimate;
 import course.oop.storage.RecordManager;
 import course.oop.storage.Records;
 import javafx.application.Platform;
@@ -25,7 +27,11 @@ import javafx.scene.text.Text;
 public class SettingsView extends ViewState {
 	private final int windowWidth = 1000;
     private final int windowHeight = 900;
-    
+    private final int game_Normal = 1;
+    private final int game_NxN = 2;
+    private final int game_Ultimate =3;
+    private final int game_Territory = 4;
+    private int gameType = game_Normal;
     
 	public SettingsView(StateMachine machine, RecordManager records) {
 		super(machine, records);
@@ -58,9 +64,22 @@ public class SettingsView extends ViewState {
 		Text timerLabel = new Text("Timer in seconds (0 for no timer): ");
 		TextField timerTextField = new TextField();
 		
+		Text n_sizeLabel = new Text("Tic Tac Toe dimension: ");
+		TextField n_sizeTextField = new TextField();
+		
         Button button1 = new Button("Start Game"); 
         Button button2 = new Button("Return to Menu"); 
  
+        
+        String[] gameTypes = {"Normal", "NxN", "Ultimate", "Territory"};
+		
+        ComboBox combo_box0 = new ComboBox(FXCollections.observableArrayList(gameTypes)); 
+        
+        String[] normal_Computer_Diff = {"Easy", "Normal", "Hard"};
+        ComboBox combo_box01 = new ComboBox(FXCollections.observableArrayList(normal_Computer_Diff)); 
+        
+        String[] normal_randomness = {"No Random", "Random"};
+        ComboBox combo_box02 = new ComboBox(FXCollections.observableArrayList(normal_randomness)); 
         
         //Creating the mouse event handler 
         EventHandler<MouseEvent> eventHandler = new EventHandler<MouseEvent>() { 
@@ -100,48 +119,186 @@ public class SettingsView extends ViewState {
         	   if (!timerTextField.getText().trim().isEmpty()) {
         		   time_ = timerTextField.getText();
         	   }
-  
+        	   
+        	   int n = 3;
+        	   if (!n_sizeTextField.getText().trim().isEmpty()) {
+        		   n = Integer.parseInt(n_sizeTextField.getText());
+        	   }
         	   StateMachine machine = getMachine();
         	   RecordManager records = getRecordManager();
         	   
-        	   TTTControllerImpl TTTController = new TTTControllerImpl();
+        	   boolean random = false;
+        	   if (combo_box02.getValue() != null) {
+        		   if (combo_box02.getValue().toString().equals("Not Random")) {
+	        		   random = false;
+	        	   }
+        		   else if (combo_box02.getValue().toString().equals("Random")) {
+	        		   random = true;
+	        	   }
+        	   }
+        	   //TTTControllerImpl_Ultimate TTTController = new TTTControllerImpl_Ultimate(); //change here
+        	   
+        	   if (combo_box0.getValue() != null) {
+	        	   if (combo_box0.getValue().toString().equals("Normal")) {
+	        		   gameType = game_Normal;
+	        	   }
+	        	   else if (combo_box0.getValue().toString().equals("NxN")) {
+	        		   gameType = game_NxN;
+	        	   }
+	        	   else if (combo_box0.getValue().toString().equals("Ultimate")) {
+	        		   gameType = game_Ultimate;
+	        	   }
+	        	   else if (combo_box0.getValue().toString().equals("Territory")) {
+	        		   gameType = game_Territory;
+	        	   }
+	        	   
+	        	   
+        	   }
+
+        	   
+        	   if (gameType == game_Normal || gameType == game_NxN) {
+        		   TTTControllerImpl TTTController = new TTTControllerImpl();
+        		   boolean computerPlaying = false;
+            	   int computerNumber = 0;
+            	   try {
+
+           	        
+    	       	        if (Integer.parseInt(numPlayers) == 1) {
+    	       				computerPlaying = true;
+    	       				computerNumber = 3 - Integer.parseInt(playerOrder);
+    	       				
+    	       			}
+    	       			else {
+    	       				computerPlaying = false;
+    	       				computerNumber = 0;
+    	       			}
+    	       	        
+    	       	        if (computerPlaying) {
+    	       	        	TTTController.createPlayer(playerOneName, playerOneMarker, Integer.parseInt(playerOrder));
+    	       	        }
+    	       	        else {
+    	       	        	TTTController.createPlayer(playerOneName, playerOneMarker, 1);
+    	       	        }
+    	       	        if (Integer.parseInt(numPlayers) == 2) {
+    	       	        	TTTController.createPlayer(playerTwoName, playerTwoMarker, 2);
+    	       	        }
+    	       	        
+    	       	        
+    	       	        
+
+    	       	   }catch(NumberFormatException nfe) {
+    	       			//text = "Please enter integer values!";
+    	       			
+    	       	   }
+            	   if (gameType == game_Normal) {
+            		   TTTController.startNewGame(Integer.parseInt(numPlayers), Integer.parseInt(time_), 3, random); //change here
+            		   int difficulty = 0;
+            		   if (combo_box01.getValue() != null) {
+            			   if (combo_box01.getValue().toString().equals("Easy")) {
+            				   difficulty = 1;
+            			   }
+            			   else if (combo_box01.getValue().toString().equals("Hard")) {
+            				   difficulty = 2;
+            			   }
+            			   else if (combo_box01.getValue().toString().equals("Normal")) {
+            				   difficulty = 0;
+            			   }
+            		   }
+            		   machine.removeStateWithReplace(new GameView_NxN(machine, records, TTTController, computerPlaying, computerNumber, difficulty, 3, random));
+            	   }
+            	   else if (gameType == game_NxN) {
+            		   TTTController.startNewGame(Integer.parseInt(numPlayers), Integer.parseInt(time_), n, random); //change here
+            		   machine.removeStateWithReplace(new GameView_NxN(machine, records, TTTController, computerPlaying, computerNumber, 0, n, random));
+            	   }
+            	   
+    	   	       
+            	   //machine.removeStateWithReplace(new GameView_Ultimate(machine, records, TTTController, computerPlaying, computerNumber));
+    	   	       
+        	   }
+        	   else if (gameType == game_Ultimate){
+        		   TTTControllerImpl_Ultimate TTTController = new TTTControllerImpl_Ultimate();
+        		   boolean computerPlaying = false;
+            	   int computerNumber = 0;
+            	   try {
+
+           	        
+    	       	        if (Integer.parseInt(numPlayers) == 1) {
+    	       				computerPlaying = true;
+    	       				computerNumber = 3 - Integer.parseInt(playerOrder);
+    	       				
+    	       			}
+    	       			else {
+    	       				computerPlaying = false;
+    	       				computerNumber = 0;
+    	       			}
+    	       	        
+    	       	        if (computerPlaying) {
+    	       	        	TTTController.createPlayer(playerOneName, playerOneMarker, Integer.parseInt(playerOrder));
+    	       	        }
+    	       	        else {
+    	       	        	TTTController.createPlayer(playerOneName, playerOneMarker, 1);
+    	       	        }
+    	       	        if (Integer.parseInt(numPlayers) == 2) {
+    	       	        	TTTController.createPlayer(playerTwoName, playerTwoMarker, 2);
+    	       	        }
+    	       	        
+    	       	        
+    	       	        
+
+    	       	   }catch(NumberFormatException nfe) {
+    	       			//text = "Please enter integer values!";
+    	       			
+    	       	   }
+
+            	   TTTController.startNewGame(Integer.parseInt(numPlayers), Integer.parseInt(time_)); //change here
+
+            	   //machine.removeStateWithReplace(new GameView_Ultimate(machine, records, TTTController, computerPlaying, computerNumber));
+    	   	       machine.removeStateWithReplace(new GameView_Ultimate(machine, records, TTTController, computerPlaying, computerNumber));
+        	   }
+        	   else if (gameType == game_Territory) {
+        		   
+        		   TTTControllerImpl_Territory TTTController = new TTTControllerImpl_Territory();
+        		   boolean computerPlaying = false;
+            	   int computerNumber = 0;
+            	   try {
+
+           	        
+    	       	        if (Integer.parseInt(numPlayers) == 1) {
+    	       				computerPlaying = true;
+    	       				computerNumber = 3 - Integer.parseInt(playerOrder);
+    	       				
+    	       			}
+    	       			else {
+    	       				computerPlaying = false;
+    	       				computerNumber = 0;
+    	       			}
+    	       	        
+    	       	        if (computerPlaying) {
+    	       	        	TTTController.createPlayer(playerOneName, playerOneMarker, Integer.parseInt(playerOrder));
+    	       	        }
+    	       	        else {
+    	       	        	TTTController.createPlayer(playerOneName, playerOneMarker, 1);
+    	       	        }
+    	       	        if (Integer.parseInt(numPlayers) == 2) {
+    	       	        	TTTController.createPlayer(playerTwoName, playerTwoMarker, 2);
+    	       	        }
+    	       	        
+    	       	        
+    	       	        
+
+    	       	   }catch(NumberFormatException nfe) {
+    	       			//text = "Please enter integer values!";
+    	       			
+    	       	   }
+
+        		   
+        		   TTTController.startNewGame(Integer.parseInt(numPlayers), Integer.parseInt(time_), n, random);
+        		   machine.removeStateWithReplace(new GameView_Territory(machine, records, TTTController, computerPlaying, computerNumber, random));
+            	   
+        	   }
         	   
         	   
-        	   boolean computerPlaying = false;
-        	   int computerNumber = 0;
-        	   try {
-
-       	        
-	       	        if (Integer.parseInt(numPlayers) == 1) {
-	       				computerPlaying = true;
-	       				computerNumber = 3 - Integer.parseInt(playerOrder);
-	       				
-	       			}
-	       			else {
-	       				computerPlaying = false;
-	       				computerNumber = 0;
-	       			}
-	       	        
-	       	        if (computerPlaying) {
-	       	        	TTTController.createPlayer(playerOneName, playerOneMarker, Integer.parseInt(playerOrder));
-	       	        }
-	       	        else {
-	       	        	TTTController.createPlayer(playerOneName, playerOneMarker, 1);
-	       	        }
-	       	        if (Integer.parseInt(numPlayers) == 2) {
-	       	        	TTTController.createPlayer(playerTwoName, playerTwoMarker, 2);
-	       	        }
-	       	        
-	       	        
-	       	        
-
-	       	   }catch(NumberFormatException nfe) {
-	       			//text = "Please enter integer values!";
-	       			
-	       	   }
-	   	       TTTController.startNewGame(Integer.parseInt(numPlayers), Integer.parseInt(time_));
-        	   machine.removeStateWithReplace(new GameView(machine, records, TTTController, computerPlaying, computerNumber));
-        	  
+        	   
            } 
         };  
         
@@ -200,14 +357,26 @@ public class SettingsView extends ViewState {
         
         gridPane.add(timerLabel, 0, 7);
         gridPane.add(timerTextField, 1, 7);
+        
+        gridPane.add(n_sizeLabel, 0, 8);
+        gridPane.add(n_sizeTextField, 1, 8);
       
         gridPane.add(button1, 0, 0); 
         gridPane.add(button2, 1, 0);
+        gridPane.add(combo_box0, 2, 0);
+        gridPane.add(combo_box01, 2, 1);
+        gridPane.add(combo_box02, 2, 2);
+        
+        
+        
+      
+        
+        
         
         
         
         Text recordsLabel = new Text("Player Records:");
-        gridPane.add(recordsLabel, 0, 8);
+        gridPane.add(recordsLabel, 0, 9);
         
         RecordManager records = getRecordManager();
         Text[] dataLabels = new Text[records.getRecords().size()];
@@ -215,7 +384,7 @@ public class SettingsView extends ViewState {
 		for (String s : records.getRecords().keySet()) {
 			Records r = records.getRecords().get(s);
 			dataLabels[i] = new Text("Name: " + r.getName() + " Marker: " + r.getMarker() + " Wins: " + r.getWins() + " Losses: " + r.getLosses() + " Ties: " + r.getTies());
-			gridPane.add(dataLabels[i], 0, i + 9);
+			gridPane.add(dataLabels[i], 0, i + 10);
 			i++;
 			/*if (i == 10) {
 				break;
@@ -223,21 +392,21 @@ public class SettingsView extends ViewState {
 		}
 		
 		Text playerOneSelect = new Text("Player One Select:");
-		gridPane.add(playerOneSelect, 0, i+10);
+		gridPane.add(playerOneSelect, 0, i+11);
 		
 		HashMap<String, Records> map = records.getRecords();
 
 		map.remove("Computer");
 		
 		ComboBox combo_box1 = new ComboBox(FXCollections.observableArrayList(map.keySet())); 
-        gridPane.add(combo_box1, 1, i+10);
+        gridPane.add(combo_box1, 1, i+11);
         
         
         Text playerTwoSelect = new Text("Player Two Select:");
-		gridPane.add(playerTwoSelect, 0, i+11);
+		gridPane.add(playerTwoSelect, 0, i+12);
         
 		ComboBox combo_box2 = new ComboBox(FXCollections.observableArrayList(map.keySet())); 
-        gridPane.add(combo_box2, 1, i+11);
+        gridPane.add(combo_box2, 1, i+12);
 		
         
        
@@ -246,7 +415,7 @@ public class SettingsView extends ViewState {
 		String[] emojis = {"❤","😃","👍","😁","😂","😘"};
 		
         ComboBox combo_box3 = new ComboBox(FXCollections.observableArrayList(emojis)); 
-        gridPane.add(combo_box3, 2, i+12);
+        gridPane.add(combo_box3, 2, i+13);
         
       
         
@@ -254,8 +423,8 @@ public class SettingsView extends ViewState {
         Button emojiSelect2 = new Button("Player Two Emoji Select");
         
         
-		gridPane.add(emojiSelect1, 0, i+12);
-		gridPane.add(emojiSelect2, 1, i+12);
+		gridPane.add(emojiSelect1, 0, i+13);
+		gridPane.add(emojiSelect2, 1, i+13);
 		
 		
         

@@ -5,75 +5,85 @@ public class MiniMax {
 	int[][] board;
 	int computerNum;
 	boolean difficult = true;
-	//int n;
+	int n;
+	private boolean[][] winningPatternArrays;
 	public MiniMax(int[][] board, int computerNum, boolean difficult) {
 		this.board = board;
 		this.computerNum = computerNum;
 		this.difficult = difficult;
-		//n = board.length;
+		n = board.length;
+		setUpWinningArrays();
 	}
 	
 
 	public int[] move() {
-		int[] result = minimax(5, computerNum); // depth, max turn
-	    return new int[] {result[1], result[2]};   // row, col
+		int[] result;
+		int depth = 7;
+
+		if (n >= 5) {
+			depth = 5 + 5 - n;
+		}
+		if (depth < 1) {
+			depth = 1;
+		}
+		if (difficult) {
+			result = minimax(depth, computerNum, Integer.MIN_VALUE, Integer.MAX_VALUE);
+		}
+		else {
+			result = minimax(depth, computerNum, Integer.MAX_VALUE, Integer.MIN_VALUE);
+		}
+	    return new int[] {result[1], result[2]}; 
 	}
 	
-	private int[] minimax(int depth, int playerNum) {
-	  // Generate possible next moves in a List of int[2] of {row, col}.
+	private int[] minimax(int depth, int playerNum, int alpha, int beta) {
+
       List<int[]> nextMoves = generateMoves();
  
-      // mySeed is maximizing; while oppSeed is minimizing
-      int bestScore;
-      if (difficult)  {
-    	  bestScore = (playerNum == computerNum) ? Integer.MIN_VALUE : Integer.MAX_VALUE;
-      }
-      else {
-    	  bestScore = (playerNum == (3-computerNum)) ? Integer.MIN_VALUE : Integer.MAX_VALUE;
-      }
 
-      int currentScore;
+
+      int currentScore = 0;
       int bestRow = -1;
       int bestCol = -1;
  
       if (nextMoves.isEmpty() || depth == 0) {
-         // Gameover or depth reached, evaluate score
-         bestScore = evaluate();
+
+         currentScore = evaluate();
+         return new int[] {currentScore, bestRow, bestCol};
       } 
       else {
          for (int[] move : nextMoves) {
-            // Try this move for the current "player"
+
             board[move[0]][move[1]] = playerNum;
-            if (playerNum == computerNum) {  // mySeed (computer) is maximizing player
-               currentScore = minimax(depth - 1, 3-computerNum)[0];
+            if (playerNum == computerNum) {  
+               currentScore = minimax(depth - 1, 3-computerNum, alpha, beta)[0];
                
                if (difficult) {
-	               if (currentScore > bestScore) {
-	                  bestScore = currentScore;
+	               if (currentScore > alpha) {
+	                  alpha = currentScore;
 	                  bestRow = move[0];
 	                  bestCol = move[1];
 	               }
                }
                else {
-            	   if (currentScore < bestScore) {
- 	                  bestScore = currentScore;
+            	   if (currentScore < alpha) {
+ 	                  alpha = currentScore;
  	                  bestRow = move[0];
  	                  bestCol = move[1];
  	               }
                }
             } 
-            else {  // oppSeed is minimizing player
-               currentScore = minimax(depth - 1, computerNum)[0];
+            else {  
+               currentScore = minimax(depth - 1, computerNum, alpha, beta)[0];
                if (difficult) {
-	               if (currentScore < bestScore) {
-	                  bestScore = currentScore;
+	               if (currentScore < beta) {
+	                  beta = currentScore;
 	                  bestRow = move[0];
 	                  bestCol = move[1];
 	               }
                }
                else {
-            	   if (currentScore > bestScore) {
- 	                  bestScore = currentScore;
+            	   if (currentScore > beta) {
+ 	                  beta = currentScore;
  	                  bestRow = move[0];
  	                  bestCol = move[1];
  	               }
@@ -81,23 +91,32 @@ public class MiniMax {
             }
             // Undo move
             board[move[0]][move[1]] = 0;
+            if (difficult) {
+	            if (alpha >= beta) {
+	            	break;
+	            }
+            }
+            else {
+            	if (beta >= alpha) {
+	            	break;
+	            }
+            }
          }
       }
-      //return new int[] {bestScore, bestRow, bestCol};
-      return new int[] {bestScore, bestRow, bestCol};
+
+
+      return new int[] {(playerNum == computerNum) ? alpha: beta, bestRow, bestCol};
     }
 	
 	private List<int[]> generateMoves() {
-      List<int[]> nextMoves = new ArrayList<int[]>(); // allocate List
- 
-      // If gameover, i.e., no next move
+      List<int[]> nextMoves = new ArrayList<int[]>(); 
       if (hasWon(computerNum) || hasWon(3-computerNum)) {
-         return nextMoves;   // return empty list
+         return nextMoves; 
       }
  
-      // Search for empty cells and add to the List
-      for (int row = 0; row < 3; row++) {
-         for (int col = 0; col < 3; col++) {
+
+      for (int row = 0; row < n; row++) {
+         for (int col = 0; col < n; col++) {
             if (board[row][col] == 0) {
                nextMoves.add(new int[] {row, col});
             }
@@ -108,88 +127,154 @@ public class MiniMax {
 	
 	
 	private boolean hasWon(int numPlayer) {
-	      int pattern = 0b000000000;  // 9-bit pattern for the 9 cells
-	      for (int row = 0; row < 3; row++) {
-	         for (int col = 0; col < 3; col++) {
+	      
+	      
+	      boolean[] patternArray = new boolean[n*n];
+	      for (int row = 0; row < n; row++) {
+	         for (int col = 0; col < n; col++) {
 	            if (board[row][col] == numPlayer) {
-	               pattern |= (1 << (row * 3 + col));
+	               
+	               patternArray[row*n+col] = true;
 	            }
 	         }
 	      }
-	      for (int winningPattern : winningPatterns) {
-	         if ((pattern & winningPattern) == winningPattern) return true;
+	      boolean foundWinning = true;
+	      for (boolean[] winningArrays : winningPatternArrays) {
+	    	  foundWinning = true;
+	    	  for (int i =0; i < n*n; i++) {
+	    		  if (winningArrays[i] == true) {
+	    			  if (patternArray[i] != true) {
+	    				  foundWinning = false;
+	    				  break;
+	    			  }
+	    		  }
+	    	  }
+	    	  if (foundWinning) {
+	    		  return true;
+	    	  }
+	    	  
 	      }
 	      return false;
+	      
+
 	   
 	}
+	
+	private void setUpWinningArrays() {
+		winningPatternArrays = new boolean[n*2 +2][n*n];
+		int count = 0;
+		for (int i = 0; i < n;i++) {
+			for (int j = 0; j < n*n; j++) {
+				if (j/n == i) {
+					winningPatternArrays[count][j] = true;
+				}
+			
+			}
+			count++;
+		}
+		for (int i = 0; i < n;i++) {
+			for (int j = 0; j < n*n; j++) {
+				if (j%n == i) {
+					winningPatternArrays[count][j] = true;
+				}
+			
+			}
+			count++;
+		}
+		
+		for (int i = 0; i < n*n; i++) {
+			if (i/n == i%n) {
+				winningPatternArrays[count][i] = true;
+			}
+		}
+		count++;
+		for (int i = 0; i < n*n; i++) {
+			if (i/n == n-1-(i%n)) {
+				winningPatternArrays[count][i] = true;
+			}
+		}
 
-	private int[] winningPatterns = {
-	        0b111000000, 0b000111000, 0b000000111, // rows
-	        0b100100100, 0b010010010, 0b001001001, // cols
-	        0b100010001, 0b001010100               // diagonals
-	};
+	}
+
+
 	
 	private int evaluate() {
 	      int score = 0;
-	      // Evaluate score for each of the 8 lines (3 rows, 3 columns, 2 diagonals)
-	      score += evaluateLine(0, 0, 0, 1, 0, 2);  // row 0
-	      score += evaluateLine(1, 0, 1, 1, 1, 2);  // row 1
-	      score += evaluateLine(2, 0, 2, 1, 2, 2);  // row 2
-	      score += evaluateLine(0, 0, 1, 0, 2, 0);  // col 0
-	      score += evaluateLine(0, 1, 1, 1, 2, 1);  // col 1
-	      score += evaluateLine(0, 2, 1, 2, 2, 2);  // col 2
-	      score += evaluateLine(0, 0, 1, 1, 2, 2);  // diagonal
-	      score += evaluateLine(0, 2, 1, 1, 2, 0);  // alternate diagonal
+
+	      int[][] line = new int[n][2];
+	      
+	      for (int k = 0; k < n; k++) {
+		      for (int i = 0; i < n; i++) {
+		    	  line[i][0] = k;
+		    	  line[i][1] = i;
+		      }
+		      score += evaluateLine_Generic(line);
+	      }
+	      
+	      for (int k = 0; k < n; k++) {
+		      for (int i = 0; i < n; i++) {
+		    	  line[i][0] = i;
+		    	  line[i][1] = k;
+		      }
+		      score += evaluateLine_Generic(line);
+	      }
+	      
+	      for (int i = 0; i < n; i++) {
+	    	  line[i][0] = i;
+	    	  line[i][1] = i;
+	      }
+	      score += evaluateLine_Generic(line);
+	      
+	      
+	      for (int i = 0; i < n; i++) {
+	    	  line[i][0] = i;
+	    	  line[i][1] = n-1-i;
+	      }
+	      score += evaluateLine_Generic(line);
+	      
 	      return score;
 	}
 	
-	private int evaluateLine(int row1, int col1, int row2, int col2, int row3, int col3) {
+	
+	
+	private int evaluateLine_Generic(int[][] row_col) {
 	      int score = 0;
+	
+
 	 
 	      // First cell
-	      if (board[row1][col1] == computerNum) {
+	      if (board[row_col[0][0]][row_col[0][1]] == computerNum) {
 	         score = 1;
-	      } else if (board[row1][col1] == 3-computerNum) {
+	      } else if (board[row_col[0][0]][row_col[0][1]] == 3-computerNum) {
 	         score = -1;
 	      }
-	 
-	      // Second cell
-	      if (board[row2][col2]== computerNum) {
-	         if (score == 1) {   // cell1 is mySeed
-	            score = 10;
-	         } else if (score == -1) {  // cell1 is oppSeed
-	            return 0;
-	         } else {  // cell1 is empty
-	            score = 1;
-	         }
-	      } else if (board[row2][col2] == 3-computerNum) {
-	         if (score == -1) { // cell1 is oppSeed
-	            score = -10;
-	         } else if (score == 1) { // cell1 is mySeed
-	            return 0;
-	         } else {  // cell1 is empty
-	            score = -1;
-	         }
+	      
+	      for (int i = 1; i < n; i++) {
+	    	  if (board[row_col[i][0]][row_col[i][1]]== computerNum) {
+	 	         if (score > 0) {   
+	 	            score *= 10;
+	 	         } else if (score < 0) {  
+	 	            return 0;
+	 	         } else {  
+	 	            score = 1;
+	 	         }
+	 	      } else if (board[row_col[i][0]][row_col[i][1]]==3-computerNum) {
+	 	         if (score < 0) { 
+	 	            score *= 10;
+	 	         } else if (score > 0) { 
+	 	            return 0;
+	 	         } else {  
+	 	            score = -1;
+	 	         }
+	 	      }
+	 	 	  
+	    	  
 	      }
-	 
-	      // Third cell
-	      if (board[row3][col3] == computerNum) {
-	         if (score > 0) {  // cell1 and/or cell2 is mySeed
-	            score *= 10;
-	         } else if (score < 0) {  // cell1 and/or cell2 is oppSeed
-	            return 0;
-	         } else {  // cell1 and cell2 are empty
-	            score = 1;
-	         }
-	      } else if (board[row3][col3] == 3-computerNum) {
-	         if (score < 0) {  // cell1 and/or cell2 is oppSeed
-	            score *= 10;
-	         } else if (score > 1) {  // cell1 and/or cell2 is mySeed
-	            return 0;
-	         } else {  // cell1 and cell2 are empty
-	            score = -1;
-	         }
-	      }
+	      
+	      
+	      
 	      return score;
-   }
+	      
+	      
+ }
 }

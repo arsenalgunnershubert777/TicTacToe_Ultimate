@@ -1,7 +1,7 @@
 package course.oop.controller;
 import java.util.*;
 
-import course.oop.game.Game;
+
 import course.oop.game.Game_NxN;
 import course.oop.player.Player;
 public class TTTControllerImpl implements TTTControllerInterface {
@@ -15,7 +15,7 @@ public class TTTControllerImpl implements TTTControllerInterface {
 	
 	
 	@Override
-	public void startNewGame(int numPlayers, int timeoutInSecs, int n, boolean random) {
+	public void startNewGame(int numPlayers, int timeoutInSecs, int n, int random) {
 		// TODO Auto-generated method stub
 		
 		if (numPlayers == 1) {
@@ -92,7 +92,7 @@ public class TTTControllerImpl implements TTTControllerInterface {
 	}
 	
 	public Player[] getPlayers() {
-		return players;
+		return players.clone();
 	}
 	public int[][] getBoard() {
 		return game.getBoard();

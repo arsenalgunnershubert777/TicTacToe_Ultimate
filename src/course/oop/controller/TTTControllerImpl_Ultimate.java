@@ -15,7 +15,7 @@ public class TTTControllerImpl_Ultimate {
 	
 	
 
-	public void startNewGame(int numPlayers, int timeoutInSecs) {
+	public void startNewGame(int numPlayers, int timeoutInSecs, int random) {
 		// TODO Auto-generated method stub
 		
 		if (numPlayers == 1) {
@@ -36,7 +36,7 @@ public class TTTControllerImpl_Ultimate {
 			}
 		}
 		//game = new Game(players);
-		game = new Game_Ultimate(players);
+		game = new Game_Ultimate(players, random);
 		turn = 1;
 		timeOut = timeoutInSecs;
 		
@@ -90,7 +90,7 @@ public class TTTControllerImpl_Ultimate {
 	}
 	
 	public Player[] getPlayers() {
-		return players;
+		return players.clone();
 	}
 	public int[][][][] getBoard() {
 		return game.getBoard();

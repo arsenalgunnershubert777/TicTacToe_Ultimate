@@ -32,7 +32,7 @@
     -fx-text-fill: blue;
     -fx-font-size: 20pt;
     -fx-background-radius: 0;
-    -fx-background-color: grey;
+    -fx-background-color:rgb(179,179,179);
 }
 
 .tileButtonFree {
@@ -88,6 +88,22 @@
     -fx-font-size: 10pt;
     -fx-background-radius: 0;
 }
+.tileButtonWin {
+	-fx-pref-height: 75px;
+    -fx-pref-width: 75px;
+    -fx-text-fill: blue;
+    -fx-background-color:rgb(255,239,53);
+    -fx-font-size: 20pt;
+    -fx-background-radius: 0;
+}
+.tileButtonLose {
+	-fx-pref-height: 75px;
+    -fx-pref-width: 75px;
+    -fx-text-fill: blue;
+    -fx-background-color: rgb(255,95,95);
+    -fx-font-size: 20pt;
+    -fx-background-radius: 0;
+}
 .orangeButton:hover{
 	-fx-color: rgb(255, 0,0);
 }
@@ -96,3 +112,8 @@
 	-fx-font-size: 30pt;
 	-fx-font-family: "Elephant";
 }
+
+.statusText{
+	-fx-font-size: 15pt;
+}
+

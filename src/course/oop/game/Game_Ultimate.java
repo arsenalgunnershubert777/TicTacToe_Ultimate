@@ -1,5 +1,8 @@
 package course.oop.game;
 
+import java.util.ArrayList;
+import java.util.Random;
+
 import course.oop.player.Player;
 
 public class Game_Ultimate {
@@ -7,26 +10,81 @@ public class Game_Ultimate {
 	private int[][] boardStatus = new int[3][3];
 	private Player[] players;
 	private int[] toPlay = {-1,-1};
+	private int random = 0;
+	private int randomCount = 0;
 	
 	//private boolean againstComputer = false;
 	
 	
-	public Game_Ultimate(Player[] players) {
+	public Game_Ultimate(Player[] players, int random) {
 		this.players = players;
+		this.random = random;
 	
 	}
 	
 	
 	
 	public boolean setSelection(int sq_row, int sq_col, int pos_row, int pos_col, int currentPlayer) {
-		/*if ((toPlay[0] != -1 && toPlay[1] != -1) && (boardStatus[toPlay[0]][toPlay[1]] != 0)) {
-			toPlay[0] = -1;
-			toPlay[1] = -1;
-		}*/
+
+		
+		
 		
 		if ((sq_row == toPlay[0] && sq_col == toPlay[1]) || (toPlay[0] == -1 && toPlay[1] == -1) ) {
 			
 			if (board[sq_row][sq_col][pos_row][pos_col] == 0 && boardStatus[sq_row][sq_col] == 0) {
+				
+				randomCount++;
+				if (random != 0) {
+					
+					if(randomCount%random == 0) {
+						//System.out.println("here");
+						Random rand = new Random();
+						int boardRow;
+						int boardCol;
+						if (toPlay[0] == -1 && toPlay[1] == -1) {
+							ArrayList<Integer> boardPositions = new ArrayList<Integer>();
+							
+							for (int i = 0; i < 9; i++) {
+								if (boardStatus[i/3][i%3] == 0) {
+									boardPositions.add(i);
+								}
+								
+							}
+							int boardPositionIndex = rand.nextInt(boardPositions.size());
+							int boardPositionNumber = boardPositions.get(boardPositionIndex);
+							boardRow = boardPositionNumber/3;
+							boardCol = boardPositionNumber%3;
+							
+							
+						}
+						else {
+							boardRow = toPlay[0];
+							boardCol = toPlay[1];
+						}
+						
+						ArrayList<Integer> positions = new ArrayList<Integer>();
+						for (int i = 0; i < 9; i++) {
+							if (board[boardRow][boardCol][i/3][i%3] == 0) {
+								positions.add(i);
+							}
+							
+						}
+						
+						int positionIndex = rand.nextInt(positions.size());
+						int positionNumber = positions.get(positionIndex);
+						
+						
+						
+						sq_row = boardRow;
+						sq_col = boardCol;
+						pos_row = positionNumber/3;
+						pos_col = positionNumber%3;
+
+					}
+				}
+				
+				
+				
 				board[sq_row][sq_col][pos_row][pos_col] = currentPlayer;
 				
 
@@ -48,14 +106,14 @@ public class Game_Ultimate {
 	}
 	
 	public int[][][][] getBoard() {
-		return board;
+		return board.clone();
 	}
 	public int[] getToPlay() {
-		return toPlay;
+		return toPlay.clone();
 	}
 	
 	public int[][] getBoardStatus() {
-		return boardStatus;
+		return boardStatus.clone();
 	}
 	
 	public int checkState() {

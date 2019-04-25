@@ -8,12 +8,14 @@ import course.oop.player.Player;
 public class Game_Territory {
 	private int[][] board = new int[5][5];
 	private Player[] players;
-	private boolean random = false;
+	private int random = 0;
+	private int randomCount = 0;
 	//private boolean againstComputer = false;
 	
 	
-	public Game_Territory(Player[] players) {
+	public Game_Territory(Player[] players, int random) {
 		this.players = players;
+		this.random = random;
 		setSpecialTiles();
 	
 	}
@@ -51,11 +53,50 @@ public class Game_Territory {
 	
 	public boolean setSelection(int row, int col, int currentPlayer) {
 		
-		/*if (random) {
-			Random rand = new Random(); 
-		}*/
+		
 		
 		if (board[row][col] == 0) {
+			randomCount++;
+			if (random != 0) {
+				
+				
+				if (randomCount%random == 0) {
+					//System.out.println("here");
+					Random rand = new Random();
+					ArrayList<Integer> positions = new ArrayList<Integer>();
+					for (int i = 0; i < 5*5; i++) {
+						if (board[i/5][i%5] == 0) {
+							positions.add(i);
+						}
+					}
+					int positionIndex = rand.nextInt(positions.size());
+					int positionNumber = positions.get(positionIndex);
+					row = positionNumber/5;
+					col = positionNumber%5;
+				}
+				
+				/*Random rand = new Random(); 
+				
+				int randFreq = (n/2)*2 + 1; //to keep it odd
+				int randGeneratedNum = rand.nextInt(randFreq);
+				if (randGeneratedNum == 0) {
+					ArrayList<Integer> positions = new ArrayList<Integer>();
+					for (int i = 0; i < board.length*board.length; i++) {
+						if (board[i/board.length][i%board.length] == 0) {
+							positions.add(i);
+						}
+					}
+					int positionIndex = rand.nextInt(positions.size());
+					int positionNumber = positions.get(positionIndex);
+					row = positionNumber/n;
+					col = positionNumber%n;
+				
+				}*/
+				
+			}
+			
+			
+			
 			board[row][col] = currentPlayer;
 			return true;
 		}
@@ -68,7 +109,7 @@ public class Game_Territory {
 	}
 	
 	public int[][] getBoard() {
-		return board;
+		return board.clone();
 	}
 	
 	public int checkState() {

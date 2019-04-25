@@ -1,6 +1,7 @@
 package course.oop.view;
 
 import java.nio.file.Paths;
+
 import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -17,6 +18,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.effect.MotionBlur;
 import javafx.scene.input.MouseEvent;
@@ -27,14 +29,16 @@ import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Rotate;
 import javafx.util.Duration;
+import javafx.scene.control.TextField;
 
 public class GameView_NxN extends ViewState {
-	private final int windowWidth = 1000;
+	private final int windowWidth = 1600;
     private final int windowHeight = 900;
     private TTTControllerImpl TTTController;
     private boolean computerPlaying = false;
     private int computerNumber = 0;
-    private Text statusLabel = new Text(10, 50,"");
+    //private Text statusLabel = new Text(10, 50,"");
+    private Label statusLabel = new Label();
     private Computer computer = new Computer();
     private int gameState = 0;
     private int gamePlayerTurn = 1;
@@ -44,9 +48,11 @@ public class GameView_NxN extends ViewState {
     private TimerTask task;
     private int diff_level = 0;
     private int n = 3;
-    private boolean random = false;
+    //private boolean random = false;
+    private int random = 0;
+    private StateMachine machine;
     
-	public GameView_NxN(StateMachine machine, RecordManager records, TTTControllerImpl TTTController, boolean ComputerPlaying, int ComputerNumber, int computerLevel, int n, boolean random) {
+	public GameView_NxN(StateMachine machine, RecordManager records, TTTControllerImpl TTTController, boolean ComputerPlaying, int ComputerNumber, int computerLevel, int n, int random) {
 		super(machine, records);
 		this.TTTController = TTTController;
 		this.computerPlaying = ComputerPlaying;
@@ -61,6 +67,9 @@ public class GameView_NxN extends ViewState {
 		
 		GridPane gridPane = new GridPane(); 
        
+		statusLabel.setMaxSize(350, 75);
+		statusLabel.setMinSize(350, 75);
+		statusLabel.getStyleClass().add("statusText");
         Button button1 = new Button("Return to Menu"); 
         Button button2 = new Button("Play again with different Settings");
         Button button3 = new Button("Play again with same settings");
@@ -177,7 +186,7 @@ public class GameView_NxN extends ViewState {
             @Override
             public void handle(long now) {
                update();
-                
+               
             }
         };
         timer.start();
@@ -218,6 +227,7 @@ public class GameView_NxN extends ViewState {
 	
 	
 	private void update() {
+		//System.out.println(gamePlayerTurn);
 		if (time > 0 && gameState == 3) {
 			
 			timerCancel();
@@ -229,7 +239,7 @@ public class GameView_NxN extends ViewState {
 			//Setting the duration for the transition 
 			rotateTransition.setDuration(Duration.millis(1000)); 
 			//Setting the node for the transition 
-			rotateTransition.setNode(statusLabel);       
+			rotateTransition.setNode(statusLabel);
 			//Setting the angle of the rotation 
 			rotateTransition.setByAngle(360); 
 			//Setting the cycle count for the transition 
@@ -240,6 +250,8 @@ public class GameView_NxN extends ViewState {
 			
 			playSound(winner);
 			addRecords(winner);
+			//System.out.println(gamePlayerTurn);
+			//System.out.println(TTTController.getPlayers()[gamePlayerTurn-1].getName());
 			
 			
 		}
@@ -272,6 +284,8 @@ public class GameView_NxN extends ViewState {
 			gameState = 2;
 			
 			//Text statusLabel = new Text("");
+			
+
 			
 			switch (winner) {
 				
@@ -328,8 +342,12 @@ public class GameView_NxN extends ViewState {
 				nextMove = computer.getNextMove(computerNumber, TTTController.getBoard(), true);
 			}
 			
-			TTTController.setSelection(nextMove[0], nextMove[1], computerNumber);
-			gamePlayerTurn = 3 - gamePlayerTurn;
+			if (TTTController.setSelection(nextMove[0], nextMove[1], computerNumber)) {
+				gamePlayerTurn = 3 - gamePlayerTurn;
+				
+			}
+
+			
 			if (time > 0) {
 				timerCancel();
 				timerSet();
@@ -338,8 +356,12 @@ public class GameView_NxN extends ViewState {
 		}
 		
 		if (gameState == 1) {
-			statusLabel.setText("Game on!");
+			
+			statusLabel.setText("Game on! " + TTTController.getPlayers()[gamePlayerTurn-1].getName() + "'s turn!");
+			//statusLabel.setWrappingWidth(300);
+			
 			//ticTacToePane.add(statusLabel, 4, 0);
+			
 		}
 		
 		
@@ -466,20 +488,37 @@ public class GameView_NxN extends ViewState {
 	}
 	
 	private void playSound(int winner) {
+		
+		for (int i = 0; i < buttons.length; i++) {
+			buttons[i].getStyleClass().removeAll("tileButton");
+		}
 		if (winner == 3) {
 			AudioClip plonkSound = new AudioClip(Paths.get("resources/Tied.mp3").toUri().toString());
 			plonkSound.play();
+			for (int i = 0; i < buttons.length; i++) {
+				buttons[i].getStyleClass().add("tileButtonTie");
+			}
 		}
 		else if (computerPlaying == true && winner == computerNumber) {
 			AudioClip plonkSound = new AudioClip(Paths.get("resources/Sad.mp3").toUri().toString());
 			plonkSound.play();
+			for (int i = 0; i < buttons.length; i++) {
+				buttons[i].getStyleClass().add("tileButtonLose");
+			}
 		}
 		else if (computerPlaying == true) {
 			AudioClip plonkSound = new AudioClip(Paths.get("resources/TaDa.mp3").toUri().toString());
+			
+			for (int i = 0; i < buttons.length; i++) {
+				buttons[i].getStyleClass().add("tileButtonWin");
+			}
 			plonkSound.play();
 		}
 		else {
 			AudioClip plonkSound = new AudioClip(Paths.get("resources/TaDa.mp3").toUri().toString());
+			for (int i = 0; i < buttons.length; i++) {
+				buttons[i].getStyleClass().add("tileButtonWin");
+			}
 			plonkSound.play();
 		}
 		

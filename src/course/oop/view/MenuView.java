@@ -20,7 +20,7 @@ import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 
 public class MenuView extends ViewState {
-	private final int windowWidth = 1000;
+	private final int windowWidth = 1600;
     private final int windowHeight = 900;
 	public MenuView(StateMachine machine, RecordManager records) {
 		super(machine, records);

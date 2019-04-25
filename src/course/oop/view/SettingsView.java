@@ -25,10 +25,10 @@ import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 
 public class SettingsView extends ViewState {
-	private final int windowWidth = 1000;
+	private final int windowWidth = 1600;
     private final int windowHeight = 900;
     private final int game_Normal = 1;
-    private final int game_NxN = 2;
+    //private final int game_NxN = 2;
     private final int game_Ultimate =3;
     private final int game_Territory = 4;
     private int gameType = game_Normal;
@@ -70,14 +70,17 @@ public class SettingsView extends ViewState {
         Button button1 = new Button("Start Game"); 
         Button button2 = new Button("Return to Menu"); 
  
-        
-        String[] gameTypes = {"Normal", "NxN", "Ultimate", "Territory"};
+        Text gameTypeLabel = new Text("Game Type:");
+        String[] gameTypes = {"Normal/NxN", "Ultimate", "Territory"};
 		
         ComboBox combo_box0 = new ComboBox(FXCollections.observableArrayList(gameTypes)); 
         
+        Text comDiffLabel = new Text("Computer Difficuly (Ultimate is Normal difficulty only):");
         String[] normal_Computer_Diff = {"Easy", "Normal", "Hard"};
         ComboBox combo_box01 = new ComboBox(FXCollections.observableArrayList(normal_Computer_Diff)); 
         
+        Text randomLabel = new Text("Randomness n:");
+        TextField randomCount = new TextField();
         String[] normal_randomness = {"No Random", "Random"};
         ComboBox combo_box02 = new ComboBox(FXCollections.observableArrayList(normal_randomness)); 
         
@@ -124,6 +127,15 @@ public class SettingsView extends ViewState {
         	   if (!n_sizeTextField.getText().trim().isEmpty()) {
         		   n = Integer.parseInt(n_sizeTextField.getText());
         	   }
+        	   int randomNum = 0;
+        	   if (!randomCount.getText().trim().isEmpty()) {
+        		   randomNum = Integer.parseInt(randomCount.getText());
+        		   if (randomNum < 0 || randomNum > n*n - 1) {
+        			   randomNum = 0;
+        		   }
+        	   }
+        	   
+        	   
         	   StateMachine machine = getMachine();
         	   RecordManager records = getRecordManager();
         	   
@@ -139,11 +151,8 @@ public class SettingsView extends ViewState {
         	   //TTTControllerImpl_Ultimate TTTController = new TTTControllerImpl_Ultimate(); //change here
         	   
         	   if (combo_box0.getValue() != null) {
-	        	   if (combo_box0.getValue().toString().equals("Normal")) {
+	        	   if (combo_box0.getValue().toString().equals("Normal/NxN")) {
 	        		   gameType = game_Normal;
-	        	   }
-	        	   else if (combo_box0.getValue().toString().equals("NxN")) {
-	        		   gameType = game_NxN;
 	        	   }
 	        	   else if (combo_box0.getValue().toString().equals("Ultimate")) {
 	        		   gameType = game_Ultimate;
@@ -154,9 +163,23 @@ public class SettingsView extends ViewState {
 	        	   
 	        	   
         	   }
+        	   
+        	   int difficulty = 0;
+    		   if (combo_box01.getValue() != null) {
+    			   if (combo_box01.getValue().toString().equals("Easy")) {
+    				   difficulty = 1;
+    			   }
+    			   else if (combo_box01.getValue().toString().equals("Hard")) {
+    				   difficulty = 2;
+    			   }
+    			   else if (combo_box01.getValue().toString().equals("Normal")) {
+    				   difficulty = 0;
+    			   }
+    		   }
+        	   
 
         	   
-        	   if (gameType == game_Normal || gameType == game_NxN) {
+        	   if (gameType == game_Normal) {
         		   TTTControllerImpl TTTController = new TTTControllerImpl();
         		   boolean computerPlaying = false;
             	   int computerNumber = 0;
@@ -190,32 +213,21 @@ public class SettingsView extends ViewState {
     	       			//text = "Please enter integer values!";
     	       			
     	       	   }
-            	   if (gameType == game_Normal) {
-            		   TTTController.startNewGame(Integer.parseInt(numPlayers), Integer.parseInt(time_), 3, random); //change here
-            		   int difficulty = 0;
-            		   if (combo_box01.getValue() != null) {
-            			   if (combo_box01.getValue().toString().equals("Easy")) {
-            				   difficulty = 1;
-            			   }
-            			   else if (combo_box01.getValue().toString().equals("Hard")) {
-            				   difficulty = 2;
-            			   }
-            			   else if (combo_box01.getValue().toString().equals("Normal")) {
-            				   difficulty = 0;
-            			   }
-            		   }
-            		   machine.removeStateWithReplace(new GameView_NxN(machine, records, TTTController, computerPlaying, computerNumber, difficulty, 3, random));
-            	   }
-            	   else if (gameType == game_NxN) {
-            		   TTTController.startNewGame(Integer.parseInt(numPlayers), Integer.parseInt(time_), n, random); //change here
-            		   machine.removeStateWithReplace(new GameView_NxN(machine, records, TTTController, computerPlaying, computerNumber, 0, n, random));
-            	   }
+            	  
+        		   TTTController.startNewGame(Integer.parseInt(numPlayers), Integer.parseInt(time_), n, randomNum); //change here
+        		   
+        		   machine.removeStateWithReplace(new GameView_NxN(machine, records, TTTController, computerPlaying, computerNumber, difficulty, n, randomNum));
+        	   
+
             	   
     	   	       
             	   //machine.removeStateWithReplace(new GameView_Ultimate(machine, records, TTTController, computerPlaying, computerNumber));
     	   	       
         	   }
         	   else if (gameType == game_Ultimate){
+        		   if (randomNum > 80) {
+        			   randomNum = 0;
+        		   }
         		   TTTControllerImpl_Ultimate TTTController = new TTTControllerImpl_Ultimate();
         		   boolean computerPlaying = false;
             	   int computerNumber = 0;
@@ -250,10 +262,10 @@ public class SettingsView extends ViewState {
     	       			
     	       	   }
 
-            	   TTTController.startNewGame(Integer.parseInt(numPlayers), Integer.parseInt(time_)); //change here
+            	   TTTController.startNewGame(Integer.parseInt(numPlayers), Integer.parseInt(time_), randomNum); //change here
 
             	   //machine.removeStateWithReplace(new GameView_Ultimate(machine, records, TTTController, computerPlaying, computerNumber));
-    	   	       machine.removeStateWithReplace(new GameView_Ultimate(machine, records, TTTController, computerPlaying, computerNumber));
+    	   	       machine.removeStateWithReplace(new GameView_Ultimate(machine, records, TTTController, computerPlaying, computerNumber, randomNum));
         	   }
         	   else if (gameType == game_Territory) {
         		   
@@ -292,10 +304,11 @@ public class SettingsView extends ViewState {
     	       	   }
 
         		   
-        		   TTTController.startNewGame(Integer.parseInt(numPlayers), Integer.parseInt(time_), n, random);
-        		   machine.removeStateWithReplace(new GameView_Territory(machine, records, TTTController, computerPlaying, computerNumber, random));
+        		   TTTController.startNewGame(Integer.parseInt(numPlayers), Integer.parseInt(time_), n, randomNum);
+        		   machine.removeStateWithReplace(new GameView_Territory(machine, records, TTTController, computerPlaying, computerNumber, difficulty, randomNum));
             	   
         	   }
+        	   //System.out.println(randomNum);
         	   
         	   
         	   
@@ -363,9 +376,16 @@ public class SettingsView extends ViewState {
       
         gridPane.add(button1, 0, 0); 
         gridPane.add(button2, 1, 0);
-        gridPane.add(combo_box0, 2, 0);
-        gridPane.add(combo_box01, 2, 1);
-        gridPane.add(combo_box02, 2, 2);
+        
+        gridPane.add(gameTypeLabel, 0, 9);
+        gridPane.add(combo_box0, 1, 9);
+        
+        gridPane.add(comDiffLabel, 0, 10);
+        gridPane.add(combo_box01, 1, 10);
+        
+        gridPane.add(randomLabel, 0, 11);
+        //gridPane.add(combo_box02, 1, 11);
+        gridPane.add(randomCount, 1, 11);
         
         
         
@@ -376,7 +396,7 @@ public class SettingsView extends ViewState {
         
         
         Text recordsLabel = new Text("Player Records:");
-        gridPane.add(recordsLabel, 0, 9);
+        gridPane.add(recordsLabel, 0, 12);
         
         RecordManager records = getRecordManager();
         Text[] dataLabels = new Text[records.getRecords().size()];
@@ -384,7 +404,7 @@ public class SettingsView extends ViewState {
 		for (String s : records.getRecords().keySet()) {
 			Records r = records.getRecords().get(s);
 			dataLabels[i] = new Text("Name: " + r.getName() + " Marker: " + r.getMarker() + " Wins: " + r.getWins() + " Losses: " + r.getLosses() + " Ties: " + r.getTies());
-			gridPane.add(dataLabels[i], 0, i + 10);
+			gridPane.add(dataLabels[i], 0, i + 13);
 			i++;
 			/*if (i == 10) {
 				break;
@@ -392,21 +412,21 @@ public class SettingsView extends ViewState {
 		}
 		
 		Text playerOneSelect = new Text("Player One Select:");
-		gridPane.add(playerOneSelect, 0, i+11);
+		gridPane.add(playerOneSelect, 0, i+14);
 		
 		HashMap<String, Records> map = records.getRecords();
 
 		map.remove("Computer");
 		
 		ComboBox combo_box1 = new ComboBox(FXCollections.observableArrayList(map.keySet())); 
-        gridPane.add(combo_box1, 1, i+11);
+        gridPane.add(combo_box1, 1, i+14);
         
         
         Text playerTwoSelect = new Text("Player Two Select:");
-		gridPane.add(playerTwoSelect, 0, i+12);
+		gridPane.add(playerTwoSelect, 0, i+15);
         
 		ComboBox combo_box2 = new ComboBox(FXCollections.observableArrayList(map.keySet())); 
-        gridPane.add(combo_box2, 1, i+12);
+        gridPane.add(combo_box2, 1, i+15);
 		
         
        
@@ -415,7 +435,7 @@ public class SettingsView extends ViewState {
 		String[] emojis = {"❤","😃","👍","😁","😂","😘"};
 		
         ComboBox combo_box3 = new ComboBox(FXCollections.observableArrayList(emojis)); 
-        gridPane.add(combo_box3, 2, i+13);
+        gridPane.add(combo_box3, 2, i+16);
         
       
         
@@ -423,8 +443,8 @@ public class SettingsView extends ViewState {
         Button emojiSelect2 = new Button("Player Two Emoji Select");
         
         
-		gridPane.add(emojiSelect1, 0, i+13);
-		gridPane.add(emojiSelect2, 1, i+13);
+		gridPane.add(emojiSelect1, 0, i+16);
+		gridPane.add(emojiSelect2, 1, i+16);
 		
 		
         

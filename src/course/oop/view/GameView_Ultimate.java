@@ -18,6 +18,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.effect.MotionBlur;
 import javafx.scene.input.MouseEvent;
@@ -32,12 +33,13 @@ import javafx.scene.transform.Rotate;
 import javafx.util.Duration;
 
 public class GameView_Ultimate extends ViewState {
-	private final int windowWidth = 1000;
+	private final int windowWidth = 1600;
     private final int windowHeight = 900;
     private TTTControllerImpl_Ultimate TTTController;
     private boolean computerPlaying = false;
     private int computerNumber = 0;
-    private Text statusLabel = new Text(10, 50,"");
+    //private Text statusLabel = new Text(10, 50,"");
+    private Label statusLabel = new Label();
     private Computer computer = new Computer();
     private int gameState = 0;
     private int gamePlayerTurn = 1;
@@ -47,19 +49,24 @@ public class GameView_Ultimate extends ViewState {
     private Timer turnTimer;
     private TimerTask task;
     private Rectangle[] r = new Rectangle[9];
+    private int random = 0;
     
-	public GameView_Ultimate(StateMachine machine, RecordManager records, TTTControllerImpl_Ultimate TTTController, boolean ComputerPlaying, int ComputerNumber) {
+	public GameView_Ultimate(StateMachine machine, RecordManager records, TTTControllerImpl_Ultimate TTTController, boolean ComputerPlaying, int ComputerNumber, int random) {
 		super(machine, records);
 		this.TTTController = TTTController;
 		this.computerPlaying = ComputerPlaying;
 		this.computerNumber = ComputerNumber;
 		this.time = TTTController.getTimeOut();
+		this.random = random;
 		
 	}
 	public GridPane constructPane() {
 		
 		GridPane gridPane = new GridPane(); 
-		
+		statusLabel.setMaxSize(350, 75);
+		statusLabel.setMinSize(350, 75);
+		statusLabel.getStyleClass().add("statusText");
+	
 		
         Button button1 = new Button("Return to Menu"); 
         Button button2 = new Button("Play again with different Settings");
@@ -104,8 +111,8 @@ public class GameView_Ultimate extends ViewState {
            	   if (computerPlaying) {
            		   numPlayers = 1;
            	   }
-           	   TTTController.startNewGame(numPlayers, time);
-          	   machine.removeStateWithReplace(new GameView_Ultimate(machine, records, TTTController, computerPlaying, computerNumber));
+           	   TTTController.startNewGame(numPlayers, time, random);
+          	   machine.removeStateWithReplace(new GameView_Ultimate(machine, records, TTTController, computerPlaying, computerNumber, random));
            	   
               } 
            };
@@ -165,6 +172,7 @@ public class GameView_Ultimate extends ViewState {
         
         
         Rectangle b = new Rectangle();
+        
 
     	b.setWidth(715);
         b.setHeight(715);
@@ -467,7 +475,9 @@ public class GameView_Ultimate extends ViewState {
 		}
 		
 		if (gameState == 1) {
-			statusLabel.setText("Game on!");
+			statusLabel.setText("Game on! " + TTTController.getPlayers()[gamePlayerTurn-1].getName() + "'s turn!");
+			//statusLabel.setWrappingWidth(300);
+			
 			//ticTacToePane.add(statusLabel, 4, 0);
 		}
 		
